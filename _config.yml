@@ -73,6 +73,6 @@ theme: apollo
 deploy:
   type: git
   repo: git@github.com:marocchino/marocchino.github.io.git
-  branch: gh-pages
+  branch: master
   name: deployer
   email: noreply@dummy.com
