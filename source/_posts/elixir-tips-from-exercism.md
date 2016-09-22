@@ -6,12 +6,15 @@ tags: elixir
 
 ## 재귀
 
-다른 언어하다와서 성능이 않좋을거라는 선입견에 가능하면 안쓰려고 했는데 괜한
-걱정이었다. 오히려 `Enum` 사용하는 쪽이 느릴 때가 많았다.
+다른 언어하다와서 성능이 안좋을거라는 선입견에 가능하면 안쓰려고 했는데 괜한
+걱정이었다. 오히려
+[`Enum`](http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2)
+사용하는 쪽이 느릴 때가 많았다.
 
 ## for 문
 
-flat_map 대신 쓸 수 있다.
+[`Enum.flat_map/2`](http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2)
+대신 쓸 수 있다.
 
 ```elixir
 # bad
@@ -36,7 +39,7 @@ for x <- min..(max - 2),
 end
 ```
 
-## 인자 갯수
+## 인자 개수
 
 줄일 수 있으면 줄여라. 짧고 읽기도 편하다.
 
@@ -67,6 +70,7 @@ def upto(n), do: [n | upto(n - 1)]
 ```elixir
 ~w(1 2 3)
 |> Enum.map(&String.to_integer(&1))
+
 # equals to
 ~w(1 2 3)
 |> Enum.map(&String.to_integer/1)
@@ -150,6 +154,15 @@ GenServer.call(pid, :up)
 # good
 [h | t]
 ```
-`to_integer(float)`가 없다. 다들 `round(Number)`사용하는 듯 하다.
-스트링을 파이프로 넘겨야 할 때는 `Regex.replace/4` 대신 `String.replace/4` 쓰면
+
+`to_integer(float)`가 없다. 다들
+[`round(Number)`](http://erlang.org/doc/man/erlang.html#round-1)사용하는 듯 하다.
+
+스트링을 파이프로 넘겨야 할 때는
+[`Regex.replace/4`](http://elixir-lang.org/docs/stable/elixir/Regex.html#replace/4) 대신
+[`String.replace/4`](http://elixir-lang.org/docs/stable/elixir/String.html#replace/4) 쓰면
 된다. 인자 순서만 다르고 기본적으로 같은 함수다.
+
+# 수정 이력
+
+9월 23일: 오타 수정, 링크 추가
