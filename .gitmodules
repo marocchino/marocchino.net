@@ -1,0 +1,4 @@
+[submodule "Hacker"]
+	path = themes/Hacker
+	url = git@github.com:marocchino/Hacker.git
+	branch = custom
