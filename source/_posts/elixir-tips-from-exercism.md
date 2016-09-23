@@ -4,14 +4,14 @@ date: 2016-09-20 00:00:00
 tags: elixir
 ---
 
-## 재귀
+# 재귀
 
 다른 언어하다와서 성능이 안좋을거라는 선입견에 가능하면 안쓰려고 했는데 괜한
 걱정이었다. 오히려
 [`Enum`](http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2)
 사용하는 쪽이 느릴 때가 많았다.
 
-## for 문
+# for 문
 
 [`Enum.flat_map/2`](http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2)
 대신 쓸 수 있다.
@@ -39,7 +39,7 @@ for x <- min..(max - 2),
 end
 ```
 
-## 인자 개수
+# 인자 개수
 
 줄일 수 있으면 줄여라. 짧고 읽기도 편하다.
 
@@ -53,17 +53,17 @@ def upto(0), do: []
 def upto(n), do: [n | upto(n - 1)]
 ```
 
-## List
+# List
 
 링크드 리스트는 배열과 다르다. 루비에서는 가능하면 배열을 적게 사용하려고
 노력했었는데 그럴 필요는 없다. 다만 zip한다던가 할게 아니면 튜플이 나을 때도
 있다.
 
-## with
+# with
 
 갓갓돋는다. BDD감각으로 읽힌다.
 
-## & Shorthand
+# & Shorthand
 
 &로 함수 시작해서 인자 넘기는 패턴 밖에 몰랐는데, 인자도 생략할 수 있더라.
 
@@ -76,7 +76,7 @@ def upto(n), do: [n | upto(n - 1)]
 |> Enum.map(&String.to_integer/1)
 ```
 
-## transpose
+# transpose
 
 이게 왜없나 싶은데.. 만들 수는 있다.
 
@@ -92,7 +92,7 @@ def transpose(list) do
 end
 ```
 
-## 디스트럭쳐링
+# 디스트럭쳐링
 
 패턴 매칭이라 기본적으로 되는데 튜플은 개수 맞춰야하는 거만 좀 조심하면 된다.
 맵이 좀 적기 귀찮은데 신텍스 슈가 같은게 있으면 좋겠다. 있는데 나만 모르는 걸
@@ -110,7 +110,7 @@ end
 %{a: a} = %{a: 1, b: 2}
 ```
 
-## state
+# state
 
 루비에서는 간단하게 돼는데 할일이 많아졌다. 요런 코드가있다고 하자.
 
@@ -143,7 +143,7 @@ GenServer.call(pid, :up)
 
 뭔가 더 단순하게 할 수있는 방법이 있었으면 좋겠다.
 
-## 그밖에
+# 그밖에
 
 가능하면 파이프써라.
 
@@ -156,12 +156,14 @@ GenServer.call(pid, :up)
 ```
 
 `to_integer(float)`가 없다. 다들
-[`round(Number)`](http://erlang.org/doc/man/erlang.html#round-1)사용하는 듯 하다.
+[`round(Number)`](http://erlang.org/doc/man/erlang.html#round-1) 사용하는 듯
+하다.
 
 스트링을 파이프로 넘겨야 할 때는
-[`Regex.replace/4`](http://elixir-lang.org/docs/stable/elixir/Regex.html#replace/4) 대신
-[`String.replace/4`](http://elixir-lang.org/docs/stable/elixir/String.html#replace/4) 쓰면
-된다. 인자 순서만 다르고 기본적으로 같은 함수다.
+[`Regex.replace/4`](http://elixir-lang.org/docs/stable/elixir/Regex.html#replace/4)
+대신
+[`String.replace/4`](http://elixir-lang.org/docs/stable/elixir/String.html#replace/4)
+쓰면 된다. 인자 순서만 다르고 기본적으로 같은 함수다.
 
 # 수정 이력
 

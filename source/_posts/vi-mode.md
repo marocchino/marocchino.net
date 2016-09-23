@@ -75,6 +75,5 @@ vi mode는 있는데 명령을 사용할 수 없는 경우도 있다. fish에서
 
 # 참고
 
-- https://linux.die.net/man/3/readline
-- https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md
-
+- <https://linux.die.net/man/3/readline>
+- <https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md>
