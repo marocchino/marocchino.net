@@ -35,7 +35,8 @@ end
 ```bash
 $ mix t
 ...
-** (Mix) "mix test" is running on environment "dev". If you are running tests along another task, please set MIX_ENV explicitly
+** (Mix) "mix test" is running on environment "dev". If you are running tests
+along another task, please set MIX_ENV explicitly
 ```
 
 프라이빗 함수를 만들어 알리아스 체인 앞에 넣는다던가 이것 저것 시도해봤지만 뒤의
