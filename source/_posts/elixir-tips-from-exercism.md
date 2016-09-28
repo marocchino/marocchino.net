@@ -155,6 +155,21 @@ GenServer.call(pid, :up)
 [h | t]
 ```
 
+까먹을 때가 가끔있는데 List.Chars.t는 Enum.t다.
+그냥 홀따옴표 표기로 적어도 Enum돌릴 수 있으니 길게 풀어쓸 필요는 없다.
+
+```elixir
+# bad
+?A in [?A, ?B, ?C]
+[?A, ?B, ?C]
+|> Enum.all?(&(&1 < ?D))
+
+# good
+?A in 'ABC'
+'ABC'
+|> Enum.all?(&(&1 < ?D))
+```
+
 `to_integer(float)`가 없다. 다들
 [`round(Number)`](http://erlang.org/doc/man/erlang.html#round-1) 사용하는 듯
 하다.
@@ -168,3 +183,4 @@ GenServer.call(pid, :up)
 # 수정 이력
 
 9월 23일: 오타 수정, 링크 추가
+9월 28일: 항목 추가
