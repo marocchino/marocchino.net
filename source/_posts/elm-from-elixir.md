@@ -97,7 +97,7 @@ String.contains? "elixir of life", "of"
 보다는
 
 ```elm
-String.contains “of” “elm tree of life”
+String.contains "of" "elm tree of life"
 ```
 
 가 읽기 힘들다.
