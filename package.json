@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "hexo": "^3.2.2",
+    "hexo-cli": "> 0",
     "hexo-browsersync": "^0.2.0",
     "hexo-deployer-git": "^0.2.0",
     "hexo-generator-archive": "^0.1.4",
@@ -34,7 +35,7 @@
     "hexo-server": "^0.2.0",
     "markdown-it-emoji": "^1.2.0",
     "markdownlint-cli": "^0.2.0",
-    "pre-commit": "^1.1.3",
+    "pre-commit": "^1.2.2",
     "twemoji": "^2.2.0"
   }
 }
