@@ -5,6 +5,12 @@ tags:
 - ruby
 ---
 
+이 글은 [루비 대림 달력](http://ruby-korea.github.io/advent-calendar/)에 빈칸
+매꾸려고 쓴 글입니다.
+
+- [7일: Ruby Meta-programming](https://github.com/ahastudio/til/blob/master/ruby/20161207-metaprogramming.md)
+- [9일: Rack 으로 미들웨어 이해하기](https://github.com/cavinkwon/redux.rb)
+
 다음 코드의 결과를 예측해보세요.
 
 ```rb

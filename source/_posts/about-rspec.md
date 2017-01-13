@@ -11,7 +11,7 @@ tags:
 작성하는 글 입니다.
 
 - [3일: Ruby 2.4.0 Preview](http://riseshia.github.io/2016/12/01/ruby-2-4-0-preview.html)
-- [5일: 미정](http://ruby-korea.github.io/advent-calendar/)
+- [5일: puma 웹서버 주기적으로 재시작](https://code.iamseapy.com/archives/38)
 
 tl;dr: Given, When, Then 단위로 나누어서 작성하세요.
 
