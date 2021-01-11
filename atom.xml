@@ -3,11 +3,11 @@
   <title>A study note</title>
   
   
-  <link href="http://marocchino.net/atom.xml" rel="self"/>
+  <link href="https://marocchino.net/atom.xml" rel="self"/>
   
-  <link href="http://marocchino.net/"/>
+  <link href="https://marocchino.net/"/>
   <updated>2021-01-11T23:08:13.026Z</updated>
-  <id>http://marocchino.net/</id>
+  <id>https://marocchino.net/</id>
   
   <author>
     <name>marocchino</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>id를 사용하는 컬럼을 저장하려면</title>
-    <link href="http://marocchino.net/2017/08/26/to-save-a-column-using-id/"/>
-    <id>http://marocchino.net/2017/08/26/to-save-a-column-using-id/</id>
+    <link href="https://marocchino.net/2017/08/26/to-save-a-column-using-id/"/>
+    <id>https://marocchino.net/2017/08/26/to-save-a-column-using-id/</id>
     <published>2017-08-26T08:54:15.000Z</published>
     <updated>2021-01-11T23:08:13.026Z</updated>
     
@@ -35,16 +35,16 @@
     
     
     
-    <category term="ruby" scheme="http://marocchino.net/tags/ruby/"/>
+    <category term="ruby" scheme="https://marocchino.net/tags/ruby/"/>
     
-    <category term="rails" scheme="http://marocchino.net/tags/rails/"/>
+    <category term="rails" scheme="https://marocchino.net/tags/rails/"/>
     
   </entry>
   
   <entry>
     <title>설계와 테스트</title>
-    <link href="http://marocchino.net/2017/01/20/tips-for-test/"/>
-    <id>http://marocchino.net/2017/01/20/tips-for-test/</id>
+    <link href="https://marocchino.net/2017/01/20/tips-for-test/"/>
+    <id>https://marocchino.net/2017/01/20/tips-for-test/</id>
     <published>2017-01-19T20:23:33.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -61,14 +61,14 @@
     
     
     
-    <category term="test" scheme="http://marocchino.net/tags/test/"/>
+    <category term="test" scheme="https://marocchino.net/tags/test/"/>
     
   </entry>
   
   <entry>
     <title>묵시는 사악해</title>
-    <link href="http://marocchino.net/2017/01/06/implicit-is-evil/"/>
-    <id>http://marocchino.net/2017/01/06/implicit-is-evil/</id>
+    <link href="https://marocchino.net/2017/01/06/implicit-is-evil/"/>
+    <id>https://marocchino.net/2017/01/06/implicit-is-evil/</id>
     <published>2017-01-05T16:11:43.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -86,14 +86,14 @@
     
     
     
-    <category term="ruby" scheme="http://marocchino.net/tags/ruby/"/>
+    <category term="ruby" scheme="https://marocchino.net/tags/ruby/"/>
     
   </entry>
   
   <entry>
     <title>rspec 잘쓰고 계신가요?</title>
-    <link href="http://marocchino.net/2016/12/04/about-rspec/"/>
-    <id>http://marocchino.net/2016/12/04/about-rspec/</id>
+    <link href="https://marocchino.net/2016/12/04/about-rspec/"/>
+    <id>https://marocchino.net/2016/12/04/about-rspec/</id>
     <published>2016-12-04T01:00:00.000Z</published>
     <updated>2021-01-11T23:08:13.024Z</updated>
     
@@ -111,18 +111,18 @@
     
     
     
-    <category term="ruby" scheme="http://marocchino.net/tags/ruby/"/>
+    <category term="ruby" scheme="https://marocchino.net/tags/ruby/"/>
     
-    <category term="rspec" scheme="http://marocchino.net/tags/rspec/"/>
+    <category term="rspec" scheme="https://marocchino.net/tags/rspec/"/>
     
-    <category term="bdd" scheme="http://marocchino.net/tags/bdd/"/>
+    <category term="bdd" scheme="https://marocchino.net/tags/bdd/"/>
     
   </entry>
   
   <entry>
     <title>Custom matcher in exunit</title>
-    <link href="http://marocchino.net/2016/10/28/custom-assert-in-exunit/"/>
-    <id>http://marocchino.net/2016/10/28/custom-assert-in-exunit/</id>
+    <link href="https://marocchino.net/2016/10/28/custom-assert-in-exunit/"/>
+    <id>https://marocchino.net/2016/10/28/custom-assert-in-exunit/</id>
     <published>2016-10-27T19:44:05.000Z</published>
     <updated>2021-01-11T23:08:13.024Z</updated>
     
@@ -137,18 +137,18 @@
     
     
     
-    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
     
-    <category term="exunit" scheme="http://marocchino.net/tags/exunit/"/>
+    <category term="exunit" scheme="https://marocchino.net/tags/exunit/"/>
     
-    <category term="test" scheme="http://marocchino.net/tags/test/"/>
+    <category term="test" scheme="https://marocchino.net/tags/test/"/>
     
   </entry>
   
   <entry>
     <title>elm from elixir</title>
-    <link href="http://marocchino.net/2016/10/17/elm-from-elixir/"/>
-    <id>http://marocchino.net/2016/10/17/elm-from-elixir/</id>
+    <link href="https://marocchino.net/2016/10/17/elm-from-elixir/"/>
+    <id>https://marocchino.net/2016/10/17/elm-from-elixir/</id>
     <published>2016-10-17T01:25:02.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -163,16 +163,16 @@
     
     
     
-    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
     
-    <category term="elm" scheme="http://marocchino.net/tags/elm/"/>
+    <category term="elm" scheme="https://marocchino.net/tags/elm/"/>
     
   </entry>
   
   <entry>
     <title>Bash tips</title>
-    <link href="http://marocchino.net/2016/09/29/bash-tips/"/>
-    <id>http://marocchino.net/2016/09/29/bash-tips/</id>
+    <link href="https://marocchino.net/2016/09/29/bash-tips/"/>
+    <id>https://marocchino.net/2016/09/29/bash-tips/</id>
     <published>2016-09-29T06:13:26.000Z</published>
     <updated>2021-01-11T23:08:13.024Z</updated>
     
@@ -188,16 +188,16 @@
     
     
     
-    <category term="bash" scheme="http://marocchino.net/tags/bash/"/>
+    <category term="bash" scheme="https://marocchino.net/tags/bash/"/>
     
-    <category term="fish" scheme="http://marocchino.net/tags/fish/"/>
+    <category term="fish" scheme="https://marocchino.net/tags/fish/"/>
     
   </entry>
   
   <entry>
     <title>Set MIX_ENV in mix task</title>
-    <link href="http://marocchino.net/2016/09/28/set-mix-env-in-mix-task/"/>
-    <id>http://marocchino.net/2016/09/28/set-mix-env-in-mix-task/</id>
+    <link href="https://marocchino.net/2016/09/28/set-mix-env-in-mix-task/"/>
+    <id>https://marocchino.net/2016/09/28/set-mix-env-in-mix-task/</id>
     <published>2016-09-28T02:30:46.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -216,16 +216,16 @@
     
     
     
-    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
     
-    <category term="mix" scheme="http://marocchino.net/tags/mix/"/>
+    <category term="mix" scheme="https://marocchino.net/tags/mix/"/>
     
   </entry>
   
   <entry>
     <title>Phoenix and Webpack</title>
-    <link href="http://marocchino.net/2016/09/24/phoenix-and-webpack/"/>
-    <id>http://marocchino.net/2016/09/24/phoenix-and-webpack/</id>
+    <link href="https://marocchino.net/2016/09/24/phoenix-and-webpack/"/>
+    <id>https://marocchino.net/2016/09/24/phoenix-and-webpack/</id>
     <published>2016-09-24T00:35:36.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -246,8 +246,8 @@
   
   <entry>
     <title>vi-mode</title>
-    <link href="http://marocchino.net/2016/09/23/vi-mode/"/>
-    <id>http://marocchino.net/2016/09/23/vi-mode/</id>
+    <link href="https://marocchino.net/2016/09/23/vi-mode/"/>
+    <id>https://marocchino.net/2016/09/23/vi-mode/</id>
     <published>2016-09-22T18:57:49.000Z</published>
     <updated>2021-01-11T23:08:13.026Z</updated>
     
@@ -263,18 +263,18 @@
     
     
     
-    <category term="bash" scheme="http://marocchino.net/tags/bash/"/>
+    <category term="bash" scheme="https://marocchino.net/tags/bash/"/>
     
-    <category term="vim" scheme="http://marocchino.net/tags/vim/"/>
+    <category term="vim" scheme="https://marocchino.net/tags/vim/"/>
     
-    <category term="shell" scheme="http://marocchino.net/tags/shell/"/>
+    <category term="shell" scheme="https://marocchino.net/tags/shell/"/>
     
   </entry>
   
   <entry>
     <title>Elixir tips from exercism</title>
-    <link href="http://marocchino.net/2016/09/20/elixir-tips-from-exercism/"/>
-    <id>http://marocchino.net/2016/09/20/elixir-tips-from-exercism/</id>
+    <link href="https://marocchino.net/2016/09/20/elixir-tips-from-exercism/"/>
+    <id>https://marocchino.net/2016/09/20/elixir-tips-from-exercism/</id>
     <published>2016-09-19T15:00:00.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -291,7 +291,7 @@
     
     
     
-    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
     
   </entry>
   
