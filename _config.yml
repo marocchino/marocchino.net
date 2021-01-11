@@ -73,6 +73,6 @@ theme: Hacker
 deploy:
   type: git
   repo: git@github.com:marocchino/marocchino.github.io.git
-  branch: master
+  branch: main
   name: deployer
   email: noreply@dummy.com
