@@ -8,7 +8,9 @@
   "scripts": {
     "test": "echo no test",
     "start": "hexo server",
+    "server": "hexo server",
     "lint": "markdownlint source",
+    "build": "hexo generate",
     "deploy": "hexo generate && hexo deploy"
   },
   "pre-commit": [
