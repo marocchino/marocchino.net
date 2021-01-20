@@ -72,7 +72,7 @@ theme: Hacker
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:marocchino/marocchino.github.io.git
+  repo: git@github.com:marocchino/marocchino.net
   branch: main
   name: deployer
   email: noreply@dummy.com
