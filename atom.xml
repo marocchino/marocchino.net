@@ -3,11 +3,11 @@
   <title>A study note</title>
   
   
-  <link href="https://marocchino.net/atom.xml" rel="self"/>
+  <link href="http://marocchino.net/atom.xml" rel="self"/>
   
-  <link href="https://marocchino.net/"/>
-  <updated>2021-01-11T23:08:13.026Z</updated>
-  <id>https://marocchino.net/</id>
+  <link href="http://marocchino.net/"/>
+  <updated>2021-05-22T14:45:57.579Z</updated>
+  <id>http://marocchino.net/</id>
   
   <author>
     <name>marocchino</name>
@@ -17,9 +17,86 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>BitWarden(rs)를 라즈베리파이에 설치하기</title>
+    <link href="http://marocchino.net/2021/04/17/install-bitwarden-to-rpi/"/>
+    <id>http://marocchino.net/2021/04/17/install-bitwarden-to-rpi/</id>
+    <published>2021-04-17T03:25:40.000Z</published>
+    <updated>2021-05-22T14:45:57.579Z</updated>
+    
+    <content type="html"><![CDATA[<h1>과정</h1><h2 id="subdomain-ipv6으로-설정">subdomain ipv6으로 설정</h2><p>젤 오래걸리니 젤 먼저하는 걸 추천 v4는 A고 v6는 AAAA인것만 기억하면 어려울것 없다.<br>주소는 ifconfig로 확인가능. (아마 없을테니까 apt로 깔자)</p><h2 id="Docker">Docker</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install docker docker-compose</span><br><span class="line">sudo adduser bitwarden</span><br><span class="line">sudo groupadd docker</span><br><span class="line">sudo usermod -aG docker bitwarden</span><br></pre></td></tr></table></figure><h2 id="Let’s-Encrypt">Let’s Encrypt</h2><p>난 여기서 파일 권한 문제로 삽질 많이했는데 그냥 bitwarden계정으로 도커를<br>실행하면 알아서 퍼미션 잡힐테니 그냥 이렇게 하면 된다.</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo su - bitwarden</span><br><span class="line">docker run -it --rm --name certbot \</span><br><span class="line">  -v <span class="string">&quot;/etc/letsencrypt:/etc/letsencrypt&quot;</span> \</span><br><span class="line">  -v <span class="string">&quot;/var/lib/letsencrypt:/var/lib/letsencrypt&quot;</span> \</span><br><span class="line">  certbot/certbot:arm64v8-latest certonly \</span><br><span class="line">  --standalone -d <span class="variable">$YOUR_DOMAIN_HERE</span> -m <span class="variable">$YOUR_EMAIL_HERE</span> --agree-tos</span><br></pre></td></tr></table></figure><h2 id="서버-띄우기">서버 띄우기</h2><p><code>start.sh</code>파일을 만들어두자.<br>로그볼일이 있을까 싶어서 일부러 <code>--rm</code>옵션은 주지 않았다.<br>ROCKET_ADDRESS는 디폴트가 0.0.0.0이라 그대로두면 IPv4에서 밖에 인식 못하니 주의</p><!-- markdownlint-disable MD013 --><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">yes | docker container prune <span class="comment"># prune이 싫으면 docker rm bitwarden 해도 된다</span></span><br><span class="line">docker run -d --name bitwarden \</span><br><span class="line">  -e ROCKET_TLS=<span class="string">&quot;&#123;certs=\&quot;/letsencrypt/live/<span class="variable">$YOUR_DOMAIN_HERE</span>/fullchain.pem\&quot;,key=\&quot;/letsencrypt/live/<span class="variable">$YOUR_DOMAIN_HERE</span>/privkey.pem\&quot;&#125;&quot;</span> \</span><br><span class="line">  -e ROCKET_ADDRESS=<span class="string">&#x27;::&#x27;</span> \</span><br><span class="line">  -e ADMIN_TOKEN=<span class="string">&quot;<span class="variable">$ADMON_TOKEN</span>&quot;</span> \</span><br><span class="line">  --hostname your.servername.here \</span><br><span class="line">  -v /etc/letsencrypt/:/letsencrypt/ \</span><br><span class="line">  -v /home/bitwarden/bwdata/:/data/ \</span><br><span class="line">  -p 443:80 \</span><br><span class="line">  vaultwarden/server:latest</span><br></pre></td></tr></table></figure><!-- markdownlint-enable MD013 --><h2 id="인증서-자동-갱신">인증서 자동 갱신</h2><p><code>renew.sh</code>파일도 만들자.</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">yes | docker container prune</span><br><span class="line">docker run -it --name certbot \</span><br><span class="line">  -v <span class="string">&quot;/etc/letsencrypt:/etc/letsencrypt&quot;</span> \</span><br><span class="line">  -v <span class="string">&quot;/var/lib/letsencrypt:/var/lib/letsencrypt&quot;</span> \</span><br><span class="line">  certbot/certbot:arm64v8-latest renew</span><br></pre></td></tr></table></figure><p>매월 15일에 갱신하고 내친김에 리붓했을때 서버 자동으로 켜게 해두자.</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">crontab -u bitwarden -e</span><br><span class="line">00 04 15 * * /home/bitwarden/renew.sh</span><br><span class="line">@reboot /home/bitwarden/start.sh</span><br></pre></td></tr></table></figure><h2 id="IPv6-IP-고정">IPv6 IP 고정</h2><p>라즈비안에서는 그런 일없었는데 리붓할때 마다 아이피가 바뀐다.</p><p>Network -&gt; Wired -&gt; Config -&gt; IPv6가서 다음 과 같이 설정한다.<br>v6 IP는 대충 <code>2409:10:12:34:56:78:90:12</code>라고 가정해보자.</p><p>Method: Manual<br>Address: 2409:10:12:34:56:78:90:12<br>Prefix: 2409:10:12:34::/64<br>Gateway: 2409:10:12:34::1</p><p>리붓하면 아이피가 고정된다.</p><h2 id="Todo">Todo</h2><p>갱신이 7월 16일이니 그때 갱신 됐는지 확인하면 될듯.</p><h2 id="이력">이력</h2><ul><li>2021.05.22 IP 고정항목 추가, bitwardenrs -&gt; vaultwarden, ROCKET_ADDRESS 추가</li></ul>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1&gt;과정&lt;/h1&gt;
+&lt;h2 id=&quot;subdomain-ipv6으로-설정&quot;&gt;subdomain ipv6으로 설정&lt;/h2&gt;
+&lt;p&gt;젤 오래걸리니 젤 먼저하는 걸 추천 v4는 A고 v6는 AAAA인것만 기억하면 어려울것 없다.&lt;br&gt;
+주소는 ifconfig로 </summary>
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>brew에 기여하기</title>
+    <link href="http://marocchino.net/2021/02/23/contribute-to-brew/"/>
+    <id>http://marocchino.net/2021/02/23/contribute-to-brew/</id>
+    <published>2021-02-22T22:49:02.000Z</published>
+    <updated>2021-03-25T06:47:50.311Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="동기">동기</h2><p>굉장히 드물게 homebrew에 최신버전이 없는걸 내가 젤 먼저 눈치챌 때가 있다.<br>새버전 나올때 까지 기다리는 것도 방법이긴 한데 의외로 기여하는 방법이 어렵지<br>않으니 어떻게 해야하는지 알고 있다면 직접 할 수도 있다.</p><p>덧붙이자면 이런 류의 기여는 재미있어서 한다기 보다는 내가 시간이 있고 마침<br>손이 비니까 하는 환경 미화 같은 것이다.</p><h2 id="발견">발견</h2><p>내 경우는 배포처에서 새버전을 만들면서 기존 버전을 지워서 눈치챌 수 있었다.</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">❯ brew install texshop</span><br><span class="line">==&gt; Downloading https://pages.uoregon.edu/koch/texshop/texshop-64/texshop458.zip</span><br><span class="line">-<span class="comment">#O#- #   #</span></span><br><span class="line">curl: (22) The requested URL returned error: 404 Not Found</span><br><span class="line">Error: Download failed on Cask <span class="string">&#x27;texshop&#x27;</span> with message: Download failed: https://pages.uoregon.edu/koch/texshop/texshop-64/texshop458.zip</span><br></pre></td></tr></table></figure><h2 id="한일">한일</h2><p>먼저 edit로 해당 탭을 열어 버전만 수정해서 인스톨 해본다.</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">❯ brew edit texshop</span><br><span class="line">Editing /usr/<span class="built_in">local</span>/Homebrew/Library/Taps/homebrew/homebrew-cask/Casks/texshop.rb</span><br><span class="line">❯ brew install texshop</span><br><span class="line">==&gt; Downloading https://pages.uoregon.edu/koch/texshop/texshop-64/texshop459.zip</span><br><span class="line"><span class="comment">######################################################################## 100.0%</span></span><br><span class="line">Error: SHA256 mismatch</span><br><span class="line">Expected: 97ccf1ebfbb30b8557c972ee2a207a4b570057ae127b9b93cfada73ffbdc907e</span><br><span class="line">  Actual: 5c018481244098c0d622f9b976cd0af1f923c7a9e80ab6fe3969ad4b338334fa</span><br><span class="line">    File: /Users/marocchino/Library/Caches/Homebrew/downloads/03b3398e2bc593405fc7eeaa245c15cf0e9cfbf0a8882b5d0e6d7e2ac9b08c5e--texshop459.zip</span><br><span class="line">To retry an incomplete download, remove the file above.</span><br></pre></td></tr></table></figure><p>sha가 다르다고 통과시켜주지 않으니 저것도 고쳐주자.</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">~ took 1m41s ❯ brew edit texshop</span><br><span class="line">Editing /usr/<span class="built_in">local</span>/Homebrew/Library/Taps/homebrew/homebrew-cask/Casks/texshop.rb</span><br><span class="line">~ took 10s ❯ brew install texshop</span><br><span class="line">Updating Homebrew...</span><br><span class="line">==&gt; Auto-updated Homebrew!</span><br><span class="line">Updated 2 taps (homebrew/core and homebrew/cask).</span><br><span class="line">==&gt; Updated Formulae</span><br><span class="line">Updated 1 formula.</span><br><span class="line">==&gt; Updated Casks</span><br><span class="line">Updated 2 casks.</span><br><span class="line"></span><br><span class="line">==&gt; Downloading https://pages.uoregon.edu/koch/texshop/texshop-64/texshop459.zip</span><br><span class="line">Already downloaded: /Users/marocchino/Library/Caches/Homebrew/downloads/03b3398e2bc593405fc7eeaa245c15cf0e9cfbf0a8882b5d0e6d7e2ac9b08c5e--texshop459.zip</span><br><span class="line">==&gt; Installing Cask texshop</span><br><span class="line">==&gt; Moving App <span class="string">&#x27;TeXShop.app&#x27;</span> to <span class="string">&#x27;/Applications/TeXShop.app&#x27;</span></span><br><span class="line">🍺  texshop was successfully installed!</span><br></pre></td></tr></table></figure><p>설치 해서 문제없이 프로그램이 열리는 걸 확인했으면 이제 방금 수정한 내용으로<br><a href="https://github.com/Homebrew/homebrew-cask/pull/100249">PR</a>을 던진다.</p><p>탬플릿을 볼 수 있는데 밑에 새캐스크 만드는 법을 무시하면 내가해야할 일을 3가지<br>이다.</p><blockquote><p><strong>Important:</strong> <em>Do not tick a checkbox if you haven’t performed its action.</em><br>Honesty is indispensable for a smooth review process.</p><p>After making all changes to a cask, verify:</p><ul><li>[ ] The submission is for<br><a href="https://github.com/Homebrew/homebrew-cask/blob/master/doc/development/adding_a_cask.md#stable-versions">a stable version</a><br>or<br><a href="https://github.com/Homebrew/homebrew-cask/blob/master/doc/development/adding_a_cask.md#but-there-is-no-stable-version">documented exception</a>.</li><li>[ ] <code>brew audit --cask &#123;&#123;cask_file&#125;&#125;</code> is error-free.</li><li>[ ] <code>brew style --fix &#123;&#123;cask_file&#125;&#125;</code> reports no offenses.</li></ul></blockquote><p>시키는 대로 하자.</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">❯ brew audit --cask texshop</span><br><span class="line">==&gt; Installing <span class="string">&#x27;bundler&#x27;</span> gem</span><br><span class="line">... 생략 ...</span><br><span class="line">Bundle complete! 30 Gemfile dependencies, 82 gems now installed.</span><br><span class="line">Bundled gems are installed into `../../usr/<span class="built_in">local</span>/Homebrew/Library/Homebrew/vendor/bundle`</span><br><span class="line">Post-install message from sorbet:</span><br><span class="line"></span><br><span class="line">  Thanks <span class="keyword">for</span> installing Sorbet! To use it <span class="keyword">in</span> your project, first run:</span><br><span class="line"></span><br><span class="line">    bundle <span class="built_in">exec</span> srb init</span><br><span class="line"></span><br><span class="line">  <span class="built_in">which</span> will get your project ready to use with Sorbet.</span><br><span class="line">  After that whenever you want to typecheck your code, run:</span><br><span class="line"></span><br><span class="line">    bundle <span class="built_in">exec</span> srb tc</span><br><span class="line"></span><br><span class="line">  For more docs see: https://sorbet.org/docs/adopting</span><br><span class="line">audit <span class="keyword">for</span> texshop: passed</span><br><span class="line">❯ brew style --fix texshop</span><br><span class="line"></span><br><span class="line">1 file inspected, no offenses detected</span><br></pre></td></tr></table></figure><p>CI가 돌고 문제가 없으면 바로 머지된다. (8분 밖에 걸리지 않았다!)</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;동기&quot;&gt;동기&lt;/h2&gt;
+&lt;p&gt;굉장히 드물게 homebrew에 최신버전이 없는걸 내가 젤 먼저 눈치챌 때가 있다.&lt;br&gt;
+새버전 나올때 까지 기다리는 것도 방법이긴 한데 의외로 기여하는 방법이 어렵지&lt;br&gt;
+않으니 어떻게 해야하는지 알고 있</summary>
+      
+    
+    
+    
+    
+    <category term="macos" scheme="http://marocchino.net/tags/macos/"/>
+    
+    <category term="homebrew" scheme="http://marocchino.net/tags/homebrew/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Blog Recovery</title>
+    <link href="http://marocchino.net/2021/01/20/blog-recovery/"/>
+    <id>http://marocchino.net/2021/01/20/blog-recovery/</id>
+    <published>2021-01-20T03:38:27.000Z</published>
+    <updated>2021-03-25T06:47:50.310Z</updated>
+    
+    <content type="html"><![CDATA[<p>오랬동안 방치했더니 죽어있길레 짬짬히 시간내서 살림.</p><p>한 작업들은 다음과 같다.</p><ul><li>A record 변경: 예전에 설정했던 값이랑 바뀌어서 갱신 해줌 <a href="https://docs.github.com/en/github/working-with-github-pages/managing-a-custom-domain-for-your-github-pages-site#configuring-an-apex-domain">참고링크</a><ul><li>적용하고 반영되는데 반나절이상 걸려서 귀찮았다.</li></ul></li><li>publish 브랜치를 master에서 main으로 변경</li><li>레포이름을 <a href="http://marocchino.github.com">marocchino.github.com</a> -&gt; marocchino.net으로 변경<ul><li>이참에 dev도메인도 살까 싶음</li></ul></li><li>테마의 대상 레포 변경<ul><li>hexo 테마를 포크해서 폰트만 바꿔서쓰고 있었는데, 시큐리티 업뎃이 귀찮아서<br>대량으로 레포지우다 포크떠논 레포도 실수로 지워버렸다가 복구하면서 그냥<br>업스트림 바라보게 변경</li></ul></li><li>hexo 메어져 업데이트<ul><li>그냥 워닝만 고쳐주니 돌아감</li></ul></li><li>markdownlintrc -&gt; markdownlint.json<ul><li>이것도 메이져 업데이트하면서 설정 파일이 바뀐듯</li></ul></li></ul><p>살렸으니 당분간 이것저것 삽질해봐야지</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;오랬동안 방치했더니 죽어있길레 짬짬히 시간내서 살림.&lt;/p&gt;
+&lt;p&gt;한 작업들은 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A record 변경: 예전에 설정했던 값이랑 바뀌어서 갱신 해줌 &lt;a href=&quot;https://docs.github.com/en</summary>
+      
+    
+    
+    
+    
+    <category term="hexo" scheme="http://marocchino.net/tags/hexo/"/>
+    
+    <category term="github page" scheme="http://marocchino.net/tags/github-page/"/>
+    
+  </entry>
+  
+  <entry>
     <title>id를 사용하는 컬럼을 저장하려면</title>
-    <link href="https://marocchino.net/2017/08/26/to-save-a-column-using-id/"/>
-    <id>https://marocchino.net/2017/08/26/to-save-a-column-using-id/</id>
+    <link href="http://marocchino.net/2017/08/26/to-save-a-column-using-id/"/>
+    <id>http://marocchino.net/2017/08/26/to-save-a-column-using-id/</id>
     <published>2017-08-26T08:54:15.000Z</published>
     <updated>2021-01-11T23:08:13.026Z</updated>
     
@@ -35,40 +112,44 @@
     
     
     
-    <category term="ruby" scheme="https://marocchino.net/tags/ruby/"/>
+    <category term="ruby" scheme="http://marocchino.net/tags/ruby/"/>
     
-    <category term="rails" scheme="https://marocchino.net/tags/rails/"/>
+    <category term="rails" scheme="http://marocchino.net/tags/rails/"/>
     
   </entry>
   
   <entry>
     <title>설계와 테스트</title>
-    <link href="https://marocchino.net/2017/01/20/tips-for-test/"/>
-    <id>https://marocchino.net/2017/01/20/tips-for-test/</id>
+    <link href="http://marocchino.net/2017/01/20/tips-for-test/"/>
+    <id>http://marocchino.net/2017/01/20/tips-for-test/</id>
     <published>2017-01-19T20:23:33.000Z</published>
-    <updated>2021-01-11T23:08:13.025Z</updated>
+    <updated>2021-03-25T06:47:50.311Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="도입"><a href="#도입" class="headerlink" title="도입"></a>도입</h1><p>tl;dr red - green - refactor</p><p>어디 보낼글 아니니 반말로 써야지.</p><p>테스트 안하는 사람들의 논리는 몇가지 패턴이 있다.</p><ul><li>바빠서 못해요.</li><li>나는 테스트에 가치를 발견하지 못하겠다.</li><li>테스트할 만한 가치가 없는 부분이에요.</li><li>변경이 너무 잦아서 의미가 없어요.</li></ul><p>위에 있는 경우는 뭐 설득당할 생각이 없거나 여유가 없는거라 어쩔 수 없는데 오늘설득 가능할 것 같은 새 패턴을 발견해서 여기에 대한 이야기를 해볼까한다.</p><ul><li>테스트하려고 설계를 망치긴 싫어요.</li></ul><p>읭??</p><h1 id="좋은-설계는-죽은-설계뿐이다"><a href="#좋은-설계는-죽은-설계뿐이다" class="headerlink" title="좋은 설계는 죽은 설계뿐이다"></a>좋은 설계는 죽은 설계뿐이다</h1><p>테스트충으로써 tdd를 하면 많은 메서드와 비대한 객체로 끌려가는 건 안다. 다만그걸 리펙터링할 타이밍을 못잡는 상황이 문제인거지 이게 tdd의 문제라 생각하지는않는다. 오히려 중요한 부분인데 설계 문제로 테스트를 못한다면 난 설계에 대해다시 고민하지 테스트를 줄여서 좋은 설계를 만들자는 주장은 안할 것 같다.</p><h1 id="좋은-테스트가-좋은-설계를-보장하지-않지만-모든-좋은-설계는-좋은-테스트를-가지고-있다"><a href="#좋은-테스트가-좋은-설계를-보장하지-않지만-모든-좋은-설계는-좋은-테스트를-가지고-있다" class="headerlink" title="좋은 테스트가 좋은 설계를 보장하지 않지만 모든 좋은 설계는 좋은 테스트를 가지고 있다"></a>좋은 테스트가 좋은 설계를 보장하지 않지만 모든 좋은 설계는 좋은 테스트를 가지고 있다</h1><p>가령 지금 테스트를 줄여 이쁘게 코드가 나왔다고 해도 코드는 고정된 자산이 아니다.많약 그런식으로 고정할 수 있는 코드라면 그냥 한번 잘짜면 되지 에초에 테스트도필요없다.</p><h1 id="그래서-테스트-팁"><a href="#그래서-테스트-팁" class="headerlink" title="그래서 테스트 팁"></a>그래서 테스트 팁</h1><p>뭐든 많이해보고 익숙해 지는 게 최고다. 굳 올드 red-green-refactor만큼 좋은 bp를본적이 없으니 그거 그냥 하자능.</p><h2 id="1-red"><a href="#1-red" class="headerlink" title="1. red"></a>1. red</h2><p>아는 범위에서 최대한 신중하게 최소 스팩을 정한다. 설계를 꼼꼼히 하고 싶다면 이단계에서 해라. 단위 테스트를 먼저하느라 설계가 이상해진다면 통합 스팩을 먼저작성해라. bdd를 한다면 문장을 만들어서 기획자한테 내가 이해한게 니가 기획한거랑일치한지 확인하는게 좋다. 근데 생각해보면 기획자의 경험이나 이해도는 내가 어떻게할 수 있는 게 아니긴하다.</p><h2 id="2-green"><a href="#2-green" class="headerlink" title="2. green"></a>2. green</h2><p>아는 범위에서 최대한 구현한다. 모르는 건 어쩔 수 없다.</p><h2 id="3-refactor"><a href="#3-refactor" class="headerlink" title="3. refactor"></a>3. refactor</h2><p>모든 코드가 적절한지 고민하고 필요없는 부분은 늦기전에 지운다. 딱히 정답이 있는부분도 아니고 경험이 잘 설명될 수 있는 부분도 아니고 이게 젤 힘들다.이게 잘 안되서 설계가 어쩌느니 테스트가 어쩌느니 궁시렁 되는데 나한테 권한이있고 이유를 설명할 수 있다면 모든 코드는 수정 가능하다는 마인드 셋이 가장중요하고 그 다음은 대량의 코드 수정을 어느정도의 효율로 할 수 있는가 정도아닐까. 대부분 리뷰에서 수정사항 대량으로 나오면 힘들어하는게 저쪽이라..</p><h1 id="그밖에"><a href="#그밖에" class="headerlink" title="그밖에"></a>그밖에</h1><ul><li>OOP 한정이지만 프라이빗은 테스트하는 거 아님.프라이빗이 테스트하고 싶어진다면, 객체를 나눌때가 된게 아닌가 고민해 보라능.</li><li>테스트할 때 의존관계 너무 많이 만드는 거 아님. 인생은 테스트 기다리며 지내기엔너무 짧다.</li><li>너무 완벽하려 노력하지 마라. 에초에 내 실력으로는 택도 없다. 할 수 있는범위에서 최대한 하는거지 뭐..</li><li>깔끔하게 개선되었을 때의 기분좋은 감각을 기억하라능.</li><li>일하는게 너무 헬이라 생각되면 불평하면서 계속다니지 말고 깔끔하게 이직하라능.자는 시간 빼고 80% 정도를 일하면서 지내는데 즐겁기라도 해야지.</li><li>개발자끼리 의견 일치를 못볼때 설득하는 거보다 짜서 보여주는게 효율적임.내가 많이 당했는데 별로 맘에 안들어도 완성품 들고오면 리젝하기 힘들더라.</li></ul>]]></content>
+    <content type="html"><![CDATA[<h1>도입</h1><p>tl;dr red - green - refactor</p><p>어디 보낼글 아니니 반말로 써야지.</p><p>테스트 안하는 사람들의 논리는 몇가지 패턴이 있다.</p><ul><li>바빠서 못해요.</li><li>나는 테스트에 가치를 발견하지 못하겠다.</li><li>테스트할 만한 가치가 없는 부분이에요.</li><li>변경이 너무 잦아서 의미가 없어요.</li></ul><p>위에 있는 경우는 뭐 설득당할 생각이 없거나 여유가 없는거라 어쩔 수 없는데 오늘<br>설득 가능할 것 같은 새 패턴을 발견해서 여기에 대한 이야기를 해볼까한다.</p><ul><li>테스트하려고 설계를 망치긴 싫어요.</li></ul><p>읭??</p><h1>좋은 설계라구?</h1><p>테스트충으로써 tdd를 하면 많은 메서드와 비대한 객체로 끌려가는 건 안다. 다만<br>그걸 리펙터링할 타이밍을 못잡는 상황이 문제인거지 이게 tdd의 문제라 생각하지는<br>않는다. 오히려 중요한 부분인데 설계 문제로 테스트를 못한다면 난 설계에 대해<br>다시 고민하지 테스트를 줄여서 좋은 설계를 만들자는 주장은 안할 것 같다.</p><h1>좋은 테스트가 좋은 설계를 보장하지 않지만 모든 좋은 설계는 좋은 테스트를 가지고 있다</h1><p>가령 지금 테스트를 줄여 이쁘게 코드가 나왔다고 해도 코드는 고정된 자산이 아니다.<br>많약 그런식으로 고정할 수 있는 코드라면 그냥 한번 잘짜면 되지 에초에 테스트도<br>필요없다.</p><h1>그래서 테스트 팁</h1><p>뭐든 많이해보고 익숙해 지는 게 최고다. 굳 올드 red-green-refactor만큼 좋은 bp를<br>본적이 없으니 그거 그냥 하자능.</p><h2 id="1-red">1. red</h2><p>아는 범위에서 최대한 신중하게 최소 스팩을 정한다. 설계를 꼼꼼히 하고 싶다면 이<br>단계에서 해라. 단위 테스트를 먼저하느라 설계가 이상해진다면 통합 스팩을 먼저<br>작성해라. bdd를 한다면 문장을 만들어서 기획자한테 내가 이해한게 니가 기획한거랑<br>일치한지 확인하는게 좋다. 근데 생각해보면 기획자의 경험이나 이해도는 내가 어떻게<br>할 수 있는 게 아니긴하다.</p><h2 id="2-green">2. green</h2><p>아는 범위에서 최대한 구현한다. 모르는 건 어쩔 수 없다.</p><h2 id="3-refactor">3. refactor</h2><p>모든 코드가 적절한지 고민하고 필요없는 부분은 늦기전에 지운다. 딱히 정답이 있는<br>부분도 아니고 경험이 잘 설명될 수 있는 부분도 아니고 이게 젤 힘들다.<br>이게 잘 안되서 설계가 어쩌느니 테스트가 어쩌느니 궁시렁 되는데 나한테 권한이<br>있고 이유를 설명할 수 있다면 모든 코드는 수정 가능하다는 마인드 셋이 가장<br>중요하고 그 다음은 대량의 코드 수정을 어느정도의 효율로 할 수 있는가 정도<br>아닐까. 대부분 리뷰에서 수정사항 대량으로 나오면 힘들어하는게 저쪽이라…</p><h1>그밖에</h1><ul><li>OOP 한정이지만 프라이빗은 테스트하는 거 아님.<br>프라이빗이 테스트하고 싶어진다면, 객체를 나눌때가 된게 아닌가 고민해 보라능.</li><li>테스트할 때 의존관계 너무 많이 만드는 거 아님. 인생은 테스트 기다리며 지내기엔<br>너무 짧다.</li><li>너무 완벽하려 노력하지 마라. 에초에 내 실력으로는 택도 없다. 할 수 있는<br>범위에서 최대한 하는거지 뭐…</li><li>깔끔하게 개선되었을 때의 기분좋은 감각을 기억하라능.</li><li>일하는게 너무 헬이라 생각되면 불평하면서 계속다니지 말고 깔끔하게 이직하라능.<br>자는 시간 빼고 80% 정도를 일하면서 지내는데 즐겁기라도 해야지.</li><li>개발자끼리 의견 일치를 못볼때 설득하는 거보다 짜서 보여주는게 효율적임.<br>내가 많이 당했는데 별로 맘에 안들어도 완성품 들고오면 리젝하기 힘들더라.</li></ul>]]></content>
     
     
       
       
-    <summary type="html">&lt;h1 id=&quot;도입&quot;&gt;&lt;a href=&quot;#도입&quot; class=&quot;headerlink&quot; title=&quot;도입&quot;&gt;&lt;/a&gt;도입&lt;/h1&gt;&lt;p&gt;tl;dr red - green - refactor&lt;/p&gt;
+    <summary type="html">&lt;h1&gt;도입&lt;/h1&gt;
+&lt;p&gt;tl;dr red - green - refactor&lt;/p&gt;
 &lt;p&gt;어디 보낼글 아니니 반말로 써야지.&lt;/p&gt;
-&lt;p&gt;테스트 안하는</summary>
+&lt;p&gt;테스트 안하는 사람들의 논리는 몇가지 패턴이 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;바빠서 못해요.&lt;/li&gt;
+&lt;li&gt;나는</summary>
       
     
     
     
     
-    <category term="test" scheme="https://marocchino.net/tags/test/"/>
+    <category term="test" scheme="http://marocchino.net/tags/test/"/>
     
   </entry>
   
   <entry>
     <title>묵시는 사악해</title>
-    <link href="https://marocchino.net/2017/01/06/implicit-is-evil/"/>
-    <id>https://marocchino.net/2017/01/06/implicit-is-evil/</id>
+    <link href="http://marocchino.net/2017/01/06/implicit-is-evil/"/>
+    <id>http://marocchino.net/2017/01/06/implicit-is-evil/</id>
     <published>2017-01-05T16:11:43.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -86,14 +167,14 @@
     
     
     
-    <category term="ruby" scheme="https://marocchino.net/tags/ruby/"/>
+    <category term="ruby" scheme="http://marocchino.net/tags/ruby/"/>
     
   </entry>
   
   <entry>
     <title>rspec 잘쓰고 계신가요?</title>
-    <link href="https://marocchino.net/2016/12/04/about-rspec/"/>
-    <id>https://marocchino.net/2016/12/04/about-rspec/</id>
+    <link href="http://marocchino.net/2016/12/04/about-rspec/"/>
+    <id>http://marocchino.net/2016/12/04/about-rspec/</id>
     <published>2016-12-04T01:00:00.000Z</published>
     <updated>2021-01-11T23:08:13.024Z</updated>
     
@@ -111,18 +192,18 @@
     
     
     
-    <category term="ruby" scheme="https://marocchino.net/tags/ruby/"/>
+    <category term="ruby" scheme="http://marocchino.net/tags/ruby/"/>
     
-    <category term="rspec" scheme="https://marocchino.net/tags/rspec/"/>
+    <category term="rspec" scheme="http://marocchino.net/tags/rspec/"/>
     
-    <category term="bdd" scheme="https://marocchino.net/tags/bdd/"/>
+    <category term="bdd" scheme="http://marocchino.net/tags/bdd/"/>
     
   </entry>
   
   <entry>
     <title>Custom matcher in exunit</title>
-    <link href="https://marocchino.net/2016/10/28/custom-assert-in-exunit/"/>
-    <id>https://marocchino.net/2016/10/28/custom-assert-in-exunit/</id>
+    <link href="http://marocchino.net/2016/10/28/custom-assert-in-exunit/"/>
+    <id>http://marocchino.net/2016/10/28/custom-assert-in-exunit/</id>
     <published>2016-10-27T19:44:05.000Z</published>
     <updated>2021-01-11T23:08:13.024Z</updated>
     
@@ -137,18 +218,18 @@
     
     
     
-    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
     
-    <category term="exunit" scheme="https://marocchino.net/tags/exunit/"/>
+    <category term="exunit" scheme="http://marocchino.net/tags/exunit/"/>
     
-    <category term="test" scheme="https://marocchino.net/tags/test/"/>
+    <category term="test" scheme="http://marocchino.net/tags/test/"/>
     
   </entry>
   
   <entry>
     <title>elm from elixir</title>
-    <link href="https://marocchino.net/2016/10/17/elm-from-elixir/"/>
-    <id>https://marocchino.net/2016/10/17/elm-from-elixir/</id>
+    <link href="http://marocchino.net/2016/10/17/elm-from-elixir/"/>
+    <id>http://marocchino.net/2016/10/17/elm-from-elixir/</id>
     <published>2016-10-17T01:25:02.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -163,16 +244,16 @@
     
     
     
-    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
     
-    <category term="elm" scheme="https://marocchino.net/tags/elm/"/>
+    <category term="elm" scheme="http://marocchino.net/tags/elm/"/>
     
   </entry>
   
   <entry>
     <title>Bash tips</title>
-    <link href="https://marocchino.net/2016/09/29/bash-tips/"/>
-    <id>https://marocchino.net/2016/09/29/bash-tips/</id>
+    <link href="http://marocchino.net/2016/09/29/bash-tips/"/>
+    <id>http://marocchino.net/2016/09/29/bash-tips/</id>
     <published>2016-09-29T06:13:26.000Z</published>
     <updated>2021-01-11T23:08:13.024Z</updated>
     
@@ -188,16 +269,16 @@
     
     
     
-    <category term="bash" scheme="https://marocchino.net/tags/bash/"/>
+    <category term="bash" scheme="http://marocchino.net/tags/bash/"/>
     
-    <category term="fish" scheme="https://marocchino.net/tags/fish/"/>
+    <category term="fish" scheme="http://marocchino.net/tags/fish/"/>
     
   </entry>
   
   <entry>
     <title>Set MIX_ENV in mix task</title>
-    <link href="https://marocchino.net/2016/09/28/set-mix-env-in-mix-task/"/>
-    <id>https://marocchino.net/2016/09/28/set-mix-env-in-mix-task/</id>
+    <link href="http://marocchino.net/2016/09/28/set-mix-env-in-mix-task/"/>
+    <id>http://marocchino.net/2016/09/28/set-mix-env-in-mix-task/</id>
     <published>2016-09-28T02:30:46.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -216,16 +297,16 @@
     
     
     
-    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
     
-    <category term="mix" scheme="https://marocchino.net/tags/mix/"/>
+    <category term="mix" scheme="http://marocchino.net/tags/mix/"/>
     
   </entry>
   
   <entry>
     <title>Phoenix and Webpack</title>
-    <link href="https://marocchino.net/2016/09/24/phoenix-and-webpack/"/>
-    <id>https://marocchino.net/2016/09/24/phoenix-and-webpack/</id>
+    <link href="http://marocchino.net/2016/09/24/phoenix-and-webpack/"/>
+    <id>http://marocchino.net/2016/09/24/phoenix-and-webpack/</id>
     <published>2016-09-24T00:35:36.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -246,8 +327,8 @@
   
   <entry>
     <title>vi-mode</title>
-    <link href="https://marocchino.net/2016/09/23/vi-mode/"/>
-    <id>https://marocchino.net/2016/09/23/vi-mode/</id>
+    <link href="http://marocchino.net/2016/09/23/vi-mode/"/>
+    <id>http://marocchino.net/2016/09/23/vi-mode/</id>
     <published>2016-09-22T18:57:49.000Z</published>
     <updated>2021-01-11T23:08:13.026Z</updated>
     
@@ -263,18 +344,18 @@
     
     
     
-    <category term="bash" scheme="https://marocchino.net/tags/bash/"/>
+    <category term="bash" scheme="http://marocchino.net/tags/bash/"/>
     
-    <category term="vim" scheme="https://marocchino.net/tags/vim/"/>
+    <category term="vim" scheme="http://marocchino.net/tags/vim/"/>
     
-    <category term="shell" scheme="https://marocchino.net/tags/shell/"/>
+    <category term="shell" scheme="http://marocchino.net/tags/shell/"/>
     
   </entry>
   
   <entry>
     <title>Elixir tips from exercism</title>
-    <link href="https://marocchino.net/2016/09/20/elixir-tips-from-exercism/"/>
-    <id>https://marocchino.net/2016/09/20/elixir-tips-from-exercism/</id>
+    <link href="http://marocchino.net/2016/09/20/elixir-tips-from-exercism/"/>
+    <id>http://marocchino.net/2016/09/20/elixir-tips-from-exercism/</id>
     <published>2016-09-19T15:00:00.000Z</published>
     <updated>2021-01-11T23:08:13.025Z</updated>
     
@@ -291,7 +372,7 @@
     
     
     
-    <category term="elixir" scheme="https://marocchino.net/tags/elixir/"/>
+    <category term="elixir" scheme="http://marocchino.net/tags/elixir/"/>
     
   </entry>
   
