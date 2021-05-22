@@ -39,6 +39,7 @@ docker run -it --rm --name certbot \
 
 `start.sh`파일을 만들어두자.
 로그볼일이 있을까 싶어서 일부러 `--rm`옵션은 주지 않았다.
+ROCKET_ADDRESS는 디폴트가 0.0.0.0이라 그대로두면 IPv4에서 밖에 인식 못하니 주의
 
 <!-- markdownlint-disable MD013 -->
 ```sh
@@ -46,11 +47,13 @@ docker run -it --rm --name certbot \
 yes | docker container prune # prune이 싫으면 docker rm bitwarden 해도 된다
 docker run -d --name bitwarden \
   -e ROCKET_TLS="{certs=\"/letsencrypt/live/$YOUR_DOMAIN_HERE/fullchain.pem\",key=\"/letsencrypt/live/$YOUR_DOMAIN_HERE/privkey.pem\"}" \
+  -e ROCKET_ADDRESS='::' \
   -e ADMIN_TOKEN="$ADMON_TOKEN" \
+  --hostname your.servername.here \
   -v /etc/letsencrypt/:/letsencrypt/ \
   -v /home/bitwarden/bwdata/:/data/ \
   -p 443:80 \
-  bitwardenrs/server:latest
+  vaultwarden/server:latest
 ```
 <!-- markdownlint-enable MD013 -->
 
@@ -75,6 +78,24 @@ crontab -u bitwarden -e
 @reboot /home/bitwarden/start.sh
 ```
 
+## IPv6 IP 고정
+
+라즈비안에서는 그런 일없었는데 리붓할때 마다 아이피가 바뀐다.
+
+Network -> Wired -> Config -> IPv6가서 다음 과 같이 설정한다.
+v6 IP는 대충 `2409:10:12:34:56:78:90:12`라고 가정해보자.
+
+Method: Manual
+Address: 2409:10:12:34:56:78:90:12
+Prefix: 2409:10:12:34::/64
+Gateway: 2409:10:12:34::1
+
+리붓하면 아이피가 고정된다.
+
 ## Todo
 
 갱신이 7월 16일이니 그때 갱신 됐는지 확인하면 될듯.
+
+## 이력
+
+- 2021.05.22 IP 고정항목 추가, bitwardenrs -> vaultwarden, ROCKET_ADDRESS 추가
