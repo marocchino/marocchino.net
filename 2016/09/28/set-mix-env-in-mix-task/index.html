@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Set MIX_ENV in mix task | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="가끔 테스트 명령이 여럿 필요할 때가 있다.
+커버리지 설정을 넣고 싶다던가.
+환경변수를 바꿔서 실행해야 한다던다..
+Mix에는 이런경우 간단히 추가할 수있는 alias가있다.
+123456789101112131415defmodule Handsup.Mixfile do  u">
+  
+
+  
+  
+  <meta name="keywords" content="elixir,mix">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Set MIX_ENV in mix task"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>Set MIX_ENV in mix task</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/28/set-mix-env-in-mix-task/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-28T02:30:46.000Z">
+          2016-09-28
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>가끔 테스트 명령이 여럿 필요할 때가 있다.
+커버리지 설정을 넣고 싶다던가.
+환경변수를 바꿔서 실행해야 한다던다..</p>
+<p>Mix에는 이런경우 간단히 추가할 수있는 alias가있다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">defmodule</span> <span class="title">Handsup.Mixfile</span></span> <span class="keyword">do</span></span><br><span class="line">  <span class="keyword">use</span> Mix.Project</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">project</span></span> <span class="keyword">do</span></span><br><span class="line">    [...</span><br><span class="line">     <span class="symbol">aliases:</span> aliases(),</span><br><span class="line">     ...]</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">defp</span> <span class="title">aliases</span></span> <span class="keyword">do</span></span><br><span class="line">    [<span class="string">"test.setup"</span>: <span class="string">"ecto.create"</span>,</span><br><span class="line">     <span class="string">"test"</span>: [<span class="string">"credo --strict"</span>, <span class="string">"ecto.migrate"</span>, <span class="string">"test"</span>],</span><br><span class="line">     <span class="string">"t"</span>: <span class="string">"test"</span>]</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>좋다. 이제 실행시켜보면 잘되겠지 싶었는데 dev로 실행시켜 버린다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ mix t</span><br><span class="line">...</span><br><span class="line">** (Mix) <span class="string">"mix test"</span> is running on environment <span class="string">"dev"</span>. If you are running tests</span><br><span class="line">along another task, please <span class="built_in">set</span> MIX_ENV explicitly</span><br></pre></td></tr></table></figure>
+<p>프라이빗 함수를 만들어 알리아스 체인 앞에 넣는다던가 이것 저것 시도해봤지만 뒤의
+테스크에 영향을 줄 수 없어서 방치하고 있었는데 전용 옵션이 따로있었다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">project</span></span> <span class="keyword">do</span></span><br><span class="line">  [...</span><br><span class="line">   <span class="symbol">aliases:</span> aliases(),</span><br><span class="line">   <span class="symbol">preferred_cli_env:</span> preferred_cli_env()</span><br><span class="line">   ...]</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">defp</span> <span class="title">preferred_cli_env</span></span> <span class="keyword">do</span></span><br><span class="line">  [<span class="string">"t"</span>: <span class="symbol">:test</span>,</span><br><span class="line">   <span class="string">"test.setup"</span>: <span class="symbol">:test</span>]</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>이제 실행해보면 테스트환경에서 잘 실행된다.</p>
+<h1 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h1><p><a href="http://elixir-lang.org/docs/stable/mix/Mix.Task.html#preferred_cli_env/1" target="_blank" rel="noopener">http://elixir-lang.org/docs/stable/mix/Mix.Task.html#preferred_cli_env/1</a></p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/elixir/">elixir</a><a href="/tags/mix/">mix</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Custom matcher in exunit | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="동기그냥 assert Regex.match?(regex, actual)는 true/false만 반환해서 디버깅할 때
+곤란했는데, 이걸 매번 메세지로 찍어주자니 귀찮아서 아예 매쳐로 만들어 볼려고
+하니 문서로 설명되어있지 않아서 정리겸..
+준비피닉스는 이미 설정 되어있어">
+  
+
+  
+  
+  <meta name="keywords" content="elixir,exunit,test">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Custom matcher in exunit"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>Custom matcher in exunit</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/10/28/custom-assert-in-exunit/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-10-27T19:44:05.000Z">
+          2016-10-28
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="동기"><a href="#동기" class="headerlink" title="동기"></a>동기</h1><p>그냥 <code>assert Regex.match?(regex, actual)</code>는 true/false만 반환해서 디버깅할 때
+곤란했는데, 이걸 매번 메세지로 찍어주자니 귀찮아서 아예 매쳐로 만들어 볼려고
+하니 문서로 설명되어있지 않아서 정리겸..</p>
+<h1 id="준비"><a href="#준비" class="headerlink" title="준비"></a>준비</h1><p>피닉스는 이미 설정 되어있어서 필요없지만 직접 만든 라이브러리라면,
+루비에서처럼 require로는 못하고 mix.exs에서 로드 경로를 설정해야 한다.
+테스트 환경에서만 로드하게 할려면 이렇게 하면된다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">project</span></span> <span class="keyword">do</span></span><br><span class="line">[...,</span><br><span class="line"> <span class="symbol">elixirc_paths:</span> elixirc_paths(Mix.env),</span><br><span class="line"> ...]</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">defp</span> <span class="title">elixirc_paths</span></span>(<span class="symbol">:test</span>), <span class="symbol">do:</span> [<span class="string">"lib"</span>, <span class="string">"test/support"</span>]</span><br><span class="line"><span class="function"><span class="keyword">defp</span> <span class="title">elixirc_paths</span></span>(_),     <span class="symbol">do:</span> [<span class="string">"lib"</span>]</span><br></pre></td></tr></table></figure>
+<p>설정후에 일단 한번 컴파일 해주자.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mix compile</span><br></pre></td></tr></table></figure>
+<h1 id="매쳐-작성"><a href="#매쳐-작성" class="headerlink" title="매쳐 작성"></a>매쳐 작성</h1><p>내가 필요했던건 정규식으로 스트링을 검증해주는 매쳐다.
+test/support 안에 넣어준다. 파일명이 exs가 아니라 ex인것에 주의.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">defmodule</span> <span class="title">ProjectName.Matcher</span></span> <span class="keyword">do</span></span><br><span class="line">  <span class="keyword">import</span> ExUnit.Assertions, <span class="symbol">only:</span> [<span class="symbol">assert:</span> <span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">assert_match</span></span>(regex, actual) <span class="keyword">do</span></span><br><span class="line">    assert Regex.match?(regex, actual), <span class="string">"<span class="subst">#&#123;actual&#125;</span> is not match."</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h1 id="사용"><a href="#사용" class="headerlink" title="사용"></a>사용</h1><p>평범하게 임포트해서 사용하면 된다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ProjectName.Matcher, <span class="symbol">only:</span> [<span class="symbol">assert_match:</span> <span class="number">2</span>]</span><br><span class="line">test <span class="string">"123 matches \\d+"</span> <span class="keyword">do</span></span><br><span class="line">  assert_match <span class="string">~r/\A\d+\z/</span>, <span class="string">"123"</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>끝.</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/elixir/">elixir</a><a href="/tags/exunit/">exunit</a><a href="/tags/test/">test</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

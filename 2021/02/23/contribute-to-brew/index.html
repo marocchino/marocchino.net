@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>brew에 기여하기 | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="동기
+굉장히 드물게 homebrew에 최신버전이 없는걸 내가 젤 먼저 눈치챌 때가 있다.
+새버전 나올때 까지 기다리는 것도 방법이긴 한데 의외로 기여하는 방법이 어렵지
+않으니 어떻게 해야하는지 알고 있다면 직접 할 수도 있다.
+덧붙이자면 이런 류의 기여는 재미있어서 한">
+  
+
+  
+  
+  <meta name="keywords" content="macos,homebrew">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="brew에 기여하기"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>brew에 기여하기</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2021/02/23/contribute-to-brew/" rel="bookmark">
+        <time class="entry-date published" datetime="2021-02-22T22:49:02.000Z">
+          2021-02-23
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h2 id="동기">동기</h2>
+<p>굉장히 드물게 homebrew에 최신버전이 없는걸 내가 젤 먼저 눈치챌 때가 있다.<br>
+새버전 나올때 까지 기다리는 것도 방법이긴 한데 의외로 기여하는 방법이 어렵지<br>
+않으니 어떻게 해야하는지 알고 있다면 직접 할 수도 있다.</p>
+<p>덧붙이자면 이런 류의 기여는 재미있어서 한다기 보다는 내가 시간이 있고 마침<br>
+손이 비니까 하는 환경 미화 같은 것이다.</p>
+<h2 id="발견">발견</h2>
+<p>내 경우는 배포처에서 새버전을 만들면서 기존 버전을 지워서 눈치챌 수 있었다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">❯ brew install texshop</span><br><span class="line">==&gt; Downloading https://pages.uoregon.edu/koch/texshop/texshop-64/texshop458.zip</span><br><span class="line">-<span class="comment">#O#- #   #</span></span><br><span class="line">curl: (22) The requested URL returned error: 404 Not Found</span><br><span class="line">Error: Download failed on Cask <span class="string">&#x27;texshop&#x27;</span> with message: Download failed: https://pages.uoregon.edu/koch/texshop/texshop-64/texshop458.zip</span><br></pre></td></tr></table></figure>
+<h2 id="한일">한일</h2>
+<p>먼저 edit로 해당 탭을 열어 버전만 수정해서 인스톨 해본다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">❯ brew edit texshop</span><br><span class="line">Editing /usr/<span class="built_in">local</span>/Homebrew/Library/Taps/homebrew/homebrew-cask/Casks/texshop.rb</span><br><span class="line">❯ brew install texshop</span><br><span class="line">==&gt; Downloading https://pages.uoregon.edu/koch/texshop/texshop-64/texshop459.zip</span><br><span class="line"><span class="comment">######################################################################## 100.0%</span></span><br><span class="line">Error: SHA256 mismatch</span><br><span class="line">Expected: 97ccf1ebfbb30b8557c972ee2a207a4b570057ae127b9b93cfada73ffbdc907e</span><br><span class="line">  Actual: 5c018481244098c0d622f9b976cd0af1f923c7a9e80ab6fe3969ad4b338334fa</span><br><span class="line">    File: /Users/marocchino/Library/Caches/Homebrew/downloads/03b3398e2bc593405fc7eeaa245c15cf0e9cfbf0a8882b5d0e6d7e2ac9b08c5e--texshop459.zip</span><br><span class="line">To retry an incomplete download, remove the file above.</span><br></pre></td></tr></table></figure>
+<p>sha가 다르다고 통과시켜주지 않으니 저것도 고쳐주자.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">~ took 1m41s ❯ brew edit texshop</span><br><span class="line">Editing /usr/<span class="built_in">local</span>/Homebrew/Library/Taps/homebrew/homebrew-cask/Casks/texshop.rb</span><br><span class="line">~ took 10s ❯ brew install texshop</span><br><span class="line">Updating Homebrew...</span><br><span class="line">==&gt; Auto-updated Homebrew!</span><br><span class="line">Updated 2 taps (homebrew/core and homebrew/cask).</span><br><span class="line">==&gt; Updated Formulae</span><br><span class="line">Updated 1 formula.</span><br><span class="line">==&gt; Updated Casks</span><br><span class="line">Updated 2 casks.</span><br><span class="line"></span><br><span class="line">==&gt; Downloading https://pages.uoregon.edu/koch/texshop/texshop-64/texshop459.zip</span><br><span class="line">Already downloaded: /Users/marocchino/Library/Caches/Homebrew/downloads/03b3398e2bc593405fc7eeaa245c15cf0e9cfbf0a8882b5d0e6d7e2ac9b08c5e--texshop459.zip</span><br><span class="line">==&gt; Installing Cask texshop</span><br><span class="line">==&gt; Moving App <span class="string">&#x27;TeXShop.app&#x27;</span> to <span class="string">&#x27;/Applications/TeXShop.app&#x27;</span></span><br><span class="line">🍺  texshop was successfully installed!</span><br></pre></td></tr></table></figure>
+<p>설치 해서 문제없이 프로그램이 열리는 걸 확인했으면 이제 방금 수정한 내용으로<br>
+<a target="_blank" rel="noopener" href="https://github.com/Homebrew/homebrew-cask/pull/100249">PR</a>을 던진다.</p>
+<p>탬플릿을 볼 수 있는데 밑에 새캐스크 만드는 법을 무시하면 내가해야할 일을 3가지<br>
+이다.</p>
+<blockquote>
+<p><strong>Important:</strong> <em>Do not tick a checkbox if you haven’t performed its action.</em><br>
+Honesty is indispensable for a smooth review process.</p>
+<p>After making all changes to a cask, verify:</p>
+<ul>
+<li>[ ] The submission is for<br>
+<a target="_blank" rel="noopener" href="https://github.com/Homebrew/homebrew-cask/blob/master/doc/development/adding_a_cask.md#stable-versions">a stable version</a><br>
+or<br>
+<a target="_blank" rel="noopener" href="https://github.com/Homebrew/homebrew-cask/blob/master/doc/development/adding_a_cask.md#but-there-is-no-stable-version">documented exception</a>.</li>
+<li>[ ] <code>brew audit --cask &#123;&#123;cask_file&#125;&#125;</code> is error-free.</li>
+<li>[ ] <code>brew style --fix &#123;&#123;cask_file&#125;&#125;</code> reports no offenses.</li>
+</ul>
+</blockquote>
+<p>시키는 대로 하자.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">❯ brew audit --cask texshop</span><br><span class="line">==&gt; Installing <span class="string">&#x27;bundler&#x27;</span> gem</span><br><span class="line">... 생략 ...</span><br><span class="line">Bundle complete! 30 Gemfile dependencies, 82 gems now installed.</span><br><span class="line">Bundled gems are installed into `../../usr/<span class="built_in">local</span>/Homebrew/Library/Homebrew/vendor/bundle`</span><br><span class="line">Post-install message from sorbet:</span><br><span class="line"></span><br><span class="line">  Thanks <span class="keyword">for</span> installing Sorbet! To use it <span class="keyword">in</span> your project, first run:</span><br><span class="line"></span><br><span class="line">    bundle <span class="built_in">exec</span> srb init</span><br><span class="line"></span><br><span class="line">  <span class="built_in">which</span> will get your project ready to use with Sorbet.</span><br><span class="line">  After that whenever you want to typecheck your code, run:</span><br><span class="line"></span><br><span class="line">    bundle <span class="built_in">exec</span> srb tc</span><br><span class="line"></span><br><span class="line">  For more docs see: https://sorbet.org/docs/adopting</span><br><span class="line">audit <span class="keyword">for</span> texshop: passed</span><br><span class="line">❯ brew style --fix texshop</span><br><span class="line"></span><br><span class="line">1 file inspected, no offenses detected</span><br></pre></td></tr></table></figure>
+<p>CI가 돌고 문제가 없으면 바로 머지된다. (8분 밖에 걸리지 않았다!)</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/macos/">macos</a><a href="/tags/homebrew/">homebrew</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

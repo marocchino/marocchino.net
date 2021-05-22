@@ -1,0 +1,462 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Page 2 | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    
+  <article>
+
+  
+    
+    <h3 class="article-title"><a href="/2016/09/28/set-mix-env-in-mix-task/"><span>Set MIX_ENV in mix task</span></a></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/28/set-mix-env-in-mix-task/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-28T02:30:46.000Z">
+          2016-09-28
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>가끔 테스트 명령이 여럿 필요할 때가 있다.
+커버리지 설정을 넣고 싶다던가.
+환경변수를 바꿔서 실행해야 한다던다..</p>
+<p>Mix에는 이런경우 간단히 추가할 수있는 alias가있다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">defmodule</span> <span class="title">Handsup.Mixfile</span></span> <span class="keyword">do</span></span><br><span class="line">  <span class="keyword">use</span> Mix.Project</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">project</span></span> <span class="keyword">do</span></span><br><span class="line">    [...</span><br><span class="line">     <span class="symbol">aliases:</span> aliases(),</span><br><span class="line">     ...]</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">defp</span> <span class="title">aliases</span></span> <span class="keyword">do</span></span><br><span class="line">    [<span class="string">"test.setup"</span>: <span class="string">"ecto.create"</span>,</span><br><span class="line">     <span class="string">"test"</span>: [<span class="string">"credo --strict"</span>, <span class="string">"ecto.migrate"</span>, <span class="string">"test"</span>],</span><br><span class="line">     <span class="string">"t"</span>: <span class="string">"test"</span>]</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>좋다. 이제 실행시켜보면 잘되겠지 싶었는데 dev로 실행시켜 버린다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ mix t</span><br><span class="line">...</span><br><span class="line">** (Mix) <span class="string">"mix test"</span> is running on environment <span class="string">"dev"</span>. If you are running tests</span><br><span class="line">along another task, please <span class="built_in">set</span> MIX_ENV explicitly</span><br></pre></td></tr></table></figure>
+<p>프라이빗 함수를 만들어 알리아스 체인 앞에 넣는다던가 이것 저것 시도해봤지만 뒤의
+테스크에 영향을 줄 수 없어서 방치하고 있었는데 전용 옵션이 따로있었다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">project</span></span> <span class="keyword">do</span></span><br><span class="line">  [...</span><br><span class="line">   <span class="symbol">aliases:</span> aliases(),</span><br><span class="line">   <span class="symbol">preferred_cli_env:</span> preferred_cli_env()</span><br><span class="line">   ...]</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">defp</span> <span class="title">preferred_cli_env</span></span> <span class="keyword">do</span></span><br><span class="line">  [<span class="string">"t"</span>: <span class="symbol">:test</span>,</span><br><span class="line">   <span class="string">"test.setup"</span>: <span class="symbol">:test</span>]</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>이제 실행해보면 테스트환경에서 잘 실행된다.</p>
+<h1 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h1><p><a href="http://elixir-lang.org/docs/stable/mix/Mix.Task.html#preferred_cli_env/1" target="_blank" rel="noopener">http://elixir-lang.org/docs/stable/mix/Mix.Task.html#preferred_cli_env/1</a></p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/elixir/">elixir</a><a href="/tags/mix/">mix</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+
+
+  <article>
+
+  
+    
+    <h3 class="article-title"><a href="/2016/09/24/phoenix-and-webpack/"><span>Phoenix and Webpack</span></a></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/24/phoenix-and-webpack/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-24T00:35:36.000Z">
+          2016-09-24
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="동기"><a href="#동기" class="headerlink" title="동기"></a>동기</h1><ul>
+<li>브런치보다 웹팩이 익숙하고 유지보수 잘되고 유저가 많다.</li>
+<li>이왕할거면 초기에 하는게 나중에 하는거보다 덜 골치아프다.</li>
+</ul>
+<h1 id="환경"><a href="#환경" class="headerlink" title="환경"></a>환경</h1><p>사용한 버전은 이렇다.</p>
+<ul>
+<li>Elixir 1.3.3</li>
+<li>Phoenix 1.2.1</li>
+<li>Node 6.6.0</li>
+</ul>
+<h1 id="과정"><a href="#과정" class="headerlink" title="과정"></a>과정</h1><p>브런치 없이 설치하는게 더 귀찮은데, 이미 오래전에 없이 설치해버려서.. 그냥 둘 다
+설명하겠다.</p>
+<p><a href="https://github.com/kenips/phoenix/blob/master/installer/lib/phoenix_new.ex#L48-L57" target="_blank" rel="noopener">소스 코드</a>를
+<a href="https://github.com/phoenixframework/phoenix/blob/master/installer/lib/phoenix_new.ex#L70-L76" target="_blank" rel="noopener">확인해도</a>
+알 수 있지만 .gitignore의 내용이 다른걸 재외하면, 두 방식의 파일 차이는 이 정도
+이다.</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="deletion">-* creating with_brunch/brunch-config.js</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/package.json</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/web/static/css/app.css</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/web/static/css/phoenix.css</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/web/static/assets/favicon.ico</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/web/static/assets/images/phoenix.png</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/web/static/js/app.js</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/web/static/js/socket.js</span></span><br><span class="line"><span class="deletion">-* creating with_brunch/web/static/assets/robots.txt</span></span><br><span class="line"><span class="addition">+* creating without_brunch/priv/static/css/app.css</span></span><br><span class="line"><span class="addition">+* creating without_brunch/priv/static/favicon.ico</span></span><br><span class="line"><span class="addition">+* creating without_brunch/priv/static/images/phoenix.png</span></span><br><span class="line"><span class="addition">+* creating without_brunch/priv/static/js/app.js</span></span><br><span class="line"><span class="addition">+* creating without_brunch/priv/static/js/phoenix.js</span></span><br><span class="line"><span class="addition">+* creating without_brunch/priv/static/robots.txt</span></span><br></pre></td></tr></table></figure>
+<p>레일스 감각으로 말하면, web/static은 app/assets이고 priv/static은 public/assets
+다. frontend같은 다른 경로를 사용해도 되긴하는데 스포클렛처럼 타이트하게 묶여
+있거나 묵시적으로 처리하는 부분이 있는게 아니라, 두 경우 모두 web/static을
+사용하도록 하겠다.</p>
+<h2 id="파일-구조-잡기"><a href="#파일-구조-잡기" class="headerlink" title="파일 구조 잡기"></a>파일 구조 잡기</h2><h3 id="브런치-없이-설치한-경우"><a href="#브런치-없이-설치한-경우" class="headerlink" title="브런치 없이 설치한 경우"></a>브런치 없이 설치한 경우</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">$ mix phoenix.new without_brunch --no-brunch</span><br><span class="line">* creating without_brunch/config/config.exs</span><br><span class="line">* creating without_brunch/config/dev.exs</span><br><span class="line">* creating without_brunch/config/prod.exs</span><br><span class="line">* creating without_brunch/config/prod.secret.exs</span><br><span class="line">* creating without_brunch/config/test.exs</span><br><span class="line">* creating without_brunch/lib/without_brunch.ex</span><br><span class="line">* creating without_brunch/lib/without_brunch/endpoint.ex</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/views/error_view_test.exs</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/support/conn_case.ex</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/support/channel_case.ex</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/test_helper.exs</span><br><span class="line">* creating without_brunch/web/channels/user_socket.ex</span><br><span class="line">* creating without_brunch/web/router.ex</span><br><span class="line">* creating without_brunch/web/views/error_view.ex</span><br><span class="line">* creating without_brunch/web/web.ex</span><br><span class="line">* creating without_brunch/mix.exs</span><br><span class="line">* creating without_brunch/README.md</span><br><span class="line">* creating without_brunch/web/gettext.ex</span><br><span class="line">* creating without_brunch/priv/gettext/errors.pot</span><br><span class="line">* creating without_brunch/priv/gettext/en/LC_MESSAGES/errors.po</span><br><span class="line">* creating without_brunch/web/views/error_helpers.ex</span><br><span class="line">* creating without_brunch/lib/without_brunch/repo.ex</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/support/model_case.ex</span><br><span class="line">* creating without_brunch/priv/repo/seeds.exs</span><br><span class="line">* creating without_brunch/.gitignore</span><br><span class="line">* creating without_brunch/priv/static/css/app.css</span><br><span class="line">* creating without_brunch/priv/static/js/app.js</span><br><span class="line">* creating without_brunch/priv/static/robots.txt</span><br><span class="line">* creating without_brunch/priv/static/js/phoenix.js</span><br><span class="line">* creating without_brunch/priv/static/images/phoenix.png</span><br><span class="line">* creating without_brunch/priv/static/favicon.ico</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/controllers/page_controller_test.exs</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/views/layout_view_test.exs</span><br><span class="line">* creating without_brunch/<span class="built_in">test</span>/views/page_view_test.exs</span><br><span class="line">* creating without_brunch/web/controllers/page_controller.ex</span><br><span class="line">* creating without_brunch/web/templates/layout/app.html.eex</span><br><span class="line">* creating without_brunch/web/templates/page/index.html.eex</span><br><span class="line">* creating without_brunch/web/views/layout_view.ex</span><br><span class="line">* creating without_brunch/web/views/page_view.ex</span><br></pre></td></tr></table></figure>
+<p>먼저 .gitignore에 node_modules, priv/static/ 을 추가한다.
+이 위치는 컴파일 후의 스테틱 파일이 올자리이다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Static artifacts</span></span><br><span class="line">/node_modules</span><br><span class="line"></span><br><span class="line"><span class="comment"># Since we are building assets from web/static,</span></span><br><span class="line"><span class="comment"># we ignore priv/static. You may want to comment</span></span><br><span class="line"><span class="comment"># this depending on your deployment strategy.</span></span><br><span class="line">/priv/static/</span><br></pre></td></tr></table></figure>
+<p>다음은 파일을 옮기고 필요없는 파일을 지운다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p web/static/assets/images web/static/js web/static/css</span><br><span class="line">mv priv/static/images/phoenix.png web/static/assets/images/phoenix.png</span><br><span class="line">mv priv/static/robots.txt web/static/assets/robots.txt</span><br><span class="line">mv priv/static/js/app.js web/static/js/app.js</span><br><span class="line">mv priv/static/favicon.ico web/static/assets/favicon.ico</span><br><span class="line">touch web/static/css/app.css</span><br><span class="line">rm -rf priv/static/*</span><br></pre></td></tr></table></figure>
+<h3 id="그냥-설치한-경우"><a href="#그냥-설치한-경우" class="headerlink" title="그냥 설치한 경우"></a>그냥 설치한 경우</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">$ mix phoenix.new with_brunch</span><br><span class="line">* creating with_brunch/config/config.exs</span><br><span class="line">* creating with_brunch/config/dev.exs</span><br><span class="line">* creating with_brunch/config/prod.exs</span><br><span class="line">* creating with_brunch/config/prod.secret.exs</span><br><span class="line">* creating with_brunch/config/test.exs</span><br><span class="line">* creating with_brunch/lib/with_brunch.ex</span><br><span class="line">* creating with_brunch/lib/with_brunch/endpoint.ex</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/views/error_view_test.exs</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/support/conn_case.ex</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/support/channel_case.ex</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/test_helper.exs</span><br><span class="line">* creating with_brunch/web/channels/user_socket.ex</span><br><span class="line">* creating with_brunch/web/router.ex</span><br><span class="line">* creating with_brunch/web/views/error_view.ex</span><br><span class="line">* creating with_brunch/web/web.ex</span><br><span class="line">* creating with_brunch/mix.exs</span><br><span class="line">* creating with_brunch/README.md</span><br><span class="line">* creating with_brunch/web/gettext.ex</span><br><span class="line">* creating with_brunch/priv/gettext/errors.pot</span><br><span class="line">* creating with_brunch/priv/gettext/en/LC_MESSAGES/errors.po</span><br><span class="line">* creating with_brunch/web/views/error_helpers.ex</span><br><span class="line">* creating with_brunch/lib/with_brunch/repo.ex</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/support/model_case.ex</span><br><span class="line">* creating with_brunch/priv/repo/seeds.exs</span><br><span class="line">* creating with_brunch/.gitignore</span><br><span class="line">* creating with_brunch/brunch-config.js</span><br><span class="line">* creating with_brunch/package.json</span><br><span class="line">* creating with_brunch/web/static/css/app.css</span><br><span class="line">* creating with_brunch/web/static/css/phoenix.css</span><br><span class="line">* creating with_brunch/web/static/js/app.js</span><br><span class="line">* creating with_brunch/web/static/js/socket.js</span><br><span class="line">* creating with_brunch/web/static/assets/robots.txt</span><br><span class="line">* creating with_brunch/web/static/assets/images/phoenix.png</span><br><span class="line">* creating with_brunch/web/static/assets/favicon.ico</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/controllers/page_controller_test.exs</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/views/layout_view_test.exs</span><br><span class="line">* creating with_brunch/<span class="built_in">test</span>/views/page_view_test.exs</span><br><span class="line">* creating with_brunch/web/controllers/page_controller.ex</span><br><span class="line">* creating with_brunch/web/templates/layout/app.html.eex</span><br><span class="line">* creating with_brunch/web/templates/page/index.html.eex</span><br><span class="line">* creating with_brunch/web/views/layout_view.ex</span><br><span class="line">* creating with_brunch/web/views/page_view.ex</span><br></pre></td></tr></table></figure>
+<p>일단 필요없는 파일을 지운다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rm brunch-config.js package.json</span><br><span class="line">rm web/static/css/phoenix.css web/static/js/socket.js</span><br></pre></td></tr></table></figure>
+<h3 id="npm-webpack-설정"><a href="#npm-webpack-설정" class="headerlink" title="npm, webpack 설정"></a>npm, webpack 설정</h3><p>다음 명령을 실행하고 적당히 내용 입력하면 package.json 파일이 만들어진다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm init</span><br></pre></td></tr></table></figure>
+<p>webpack을 설치하고 설정 파일을 만든다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install --save-dev webpack babel-preset-es2015 copy-webpack-plugin \</span><br><span class="line">                       babel-loader babel-core \</span><br><span class="line">                       css-loader extract-text-webpack-plugin style-loader</span><br></pre></td></tr></table></figure>
+<p>webpack.config.js파일은 이런 내용이 들어가면 된다.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ExtractTextPlugin = <span class="built_in">require</span>(<span class="string">"extract-text-webpack-plugin"</span>)</span><br><span class="line"><span class="keyword">const</span> CopyWebpackPlugin = <span class="built_in">require</span>(<span class="string">"copy-webpack-plugin"</span>)</span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: [<span class="string">"./web/static/css/app.css"</span>,</span><br><span class="line">          <span class="string">"./web/static/js/app.js"</span>],</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: <span class="string">"./priv/static"</span>,</span><br><span class="line">    filename: <span class="string">"js/app.js"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    loaders: [&#123;</span><br><span class="line">      test: <span class="regexp">/\.js$/</span>,</span><br><span class="line">      exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">      include: __dirname,</span><br><span class="line">      loader: [<span class="string">"babel"</span>],</span><br><span class="line">      query: &#123;</span><br><span class="line">        presets: [<span class="string">"es2015"</span>]</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">      test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">      loader: ExtractTextPlugin.extract(<span class="string">"style"</span>, <span class="string">"css"</span>)</span><br><span class="line">    &#125;]</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> ExtractTextPlugin(<span class="string">"css/app.css"</span>),</span><br><span class="line">    <span class="keyword">new</span> CopyWebpackPlugin([&#123; <span class="attr">from</span>: <span class="string">"./web/static/assets"</span> &#125;])</span><br><span class="line">  ],</span><br><span class="line">  resolve: &#123;</span><br><span class="line">    modulesDirectories: [ <span class="string">"node_modules"</span>, __dirname + <span class="string">"/web/static/js"</span> ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>일단 정적파일의 복사, js, css의 생성까지만 다루는 단순한 설정이다.</p>
+<p>package.json에 실행 옵션을 포함한 단축명령을 적는다.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">"scripts": &#123;</span><br><span class="line">  "start": "webpack --watch-stdin --progress --color",</span><br><span class="line">  "compile": "webpack -p"</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<p>방금 생성한 명령을 watcher에 추가해 파일 수정이 있을때마다 실행 시킬 수 있다.</p>
+<p>config/dev.exs에 넣어두자</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">config <span class="symbol">:app_name</span>, AppName.Endpoint,</span><br><span class="line">  <span class="comment"># 다른 설정은 그대로 둘것</span></span><br><span class="line">  <span class="symbol">watchers:</span> [<span class="symbol">npm:</span> [<span class="string">"start"</span>]]</span><br></pre></td></tr></table></figure>
+<h2 id="phoenix-자바스크립트들"><a href="#phoenix-자바스크립트들" class="headerlink" title="phoenix 자바스크립트들"></a>phoenix 자바스크립트들</h2><p>npm에 등록되어있으니 그냥 설치하면된다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install file:deps/phoenix_html file:deps/phoenix --save</span><br></pre></td></tr></table></figure>
+<p>위에 패스도 잡아뒀으니, 이전처럼 import해서 사용할 수 있다.</p>
+<h1 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h1><p><a href="http://matthewlehner.net/using-webpack-with-phoenix-and-elixir/" target="_blank" rel="noopener">http://matthewlehner.net/using-webpack-with-phoenix-and-elixir/</a>
+<a href="http://mikker.github.io/2016/02/04/updated-phoenix-webpack-react-setup.html" target="_blank" rel="noopener">http://mikker.github.io/2016/02/04/updated-phoenix-webpack-react-setup.html</a></p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+
+
+  <article>
+
+  
+    
+    <h3 class="article-title"><a href="/2016/09/23/vi-mode/"><span>vi-mode</span></a></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/23/vi-mode/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-22T18:57:49.000Z">
+          2016-09-23
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="tl-dr"><a href="#tl-dr" class="headerlink" title="tl;dr"></a>tl;dr</h1><p>RTFM</p>
+<h1 id="동기"><a href="#동기" class="headerlink" title="동기"></a>동기</h1><p>처음에는 이맥스 단축키 외우기 귀찮고 빔이 더 편하지 않을까 정도로 쓰기
+시작했다만, 한 2년간 사용했는데도 인터프리터랄께 셸마다 미묘하게 동작이 틀리기도
+하고 아예 사용할 수 없는 경우도 있어서 그냥 이맥스 모드도 익숙해져버렸다.</p>
+<p>익히고 까먹고 익히고 까먹고를 반복하고 있어서 정리할 겸..</p>
+<h1 id="설정"><a href="#설정" class="headerlink" title="설정"></a>설정</h1><p>기본적으로는 <code>.inputrc</code>에 추가 하기만 하면 된다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> editing-mode vi</span><br></pre></td></tr></table></figure>
+<p>다만, <code>fzf</code>를 사용한다면 <a href="https://github.com/junegunn/fzf/issues/39" target="_blank" rel="noopener">오동작</a>이
+생기니 <code>.bashrc</code>에서 로드하기 전에 한번 더 설정해줘야 한다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> -o vi</span><br><span class="line">[ -f ~/.fzf.bash ] &amp;&amp; <span class="built_in">source</span> ~/.fzf.bash</span><br></pre></td></tr></table></figure>
+<p>이것만해도 사용하는데는 크게 문제 없는데, 가끔 지금 어떤 모드에 있는지 몰라서
+삽질할 때가 있으니 프롬프트에 현재 상태를 표시하게 해뒀다.
+<code>.inputrc</code>에 추가로..</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> show-mode-in-prompt on</span><br><span class="line"><span class="built_in">set</span> vi-ins-mode-string \1\e[34;1m\2✚ \1\e[0m\2</span><br><span class="line"><span class="built_in">set</span> vi-cmd-mode-string \1\e[35;1m\2: \1\e[0m\2</span><br></pre></td></tr></table></figure>
+<h1 id="사용하기"><a href="#사용하기" class="headerlink" title="사용하기"></a>사용하기</h1><p>전채 목록은 <a href="https://linux.die.net/man/3/readline" target="_blank" rel="noopener">readline</a>의 Default Key
+Bindings 항목을 읽어보면 된다. 이정도는 알아 둘만 한 것들만 뽑아봤다.</p>
+<table>
+<thead>
+<tr>
+<th>명령</th>
+<th>이맥스</th>
+<th>빔</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>맨 앞으로 이동</td>
+<td>ctrl-a</td>
+<td>esc I</td>
+</tr>
+<tr>
+<td>맨 뒤로 이동</td>
+<td>ctrl-e</td>
+<td>esc A</td>
+</tr>
+<tr>
+<td>단어단위 앞으로 이동</td>
+<td>ctrl-b</td>
+<td>esc b</td>
+</tr>
+<tr>
+<td>단어단위 뒤로 이동</td>
+<td>ctrl-f</td>
+<td>esc w</td>
+</tr>
+<tr>
+<td>커서위치부터 뒤 삭제</td>
+<td>ctrl-k</td>
+<td>esc D</td>
+</tr>
+<tr>
+<td>에디터에서 열기</td>
+<td>ctrl-x ctrl-e</td>
+<td>esc v</td>
+</tr>
+<tr>
+<td>히스토리 검색</td>
+<td>ctrl-r</td>
+<td>ctrl-r</td>
+</tr>
+<tr>
+<td>주석 처리</td>
+<td>alt-#</td>
+<td>esc I#</td>
+</tr>
+<tr>
+<td>클리어</td>
+<td>ctrl-l</td>
+<td>esc ctrl-l</td>
+</tr>
+</tbody>
+</table>
+<h1 id="문제점"><a href="#문제점" class="headerlink" title="문제점"></a>문제점</h1><p>아까도 말했는데 몇몇 콘솔은 vi mode를 무시한다. 대표적으로
+<a href="http://stackoverflow.com/questions/11976765/erlang-interpreter-vi-mode" target="_blank" rel="noopener">Erlang</a>하고
+그 위에서 돌아가는 <a href="https://github.com/elixir-lang/elixir/issues/4533" target="_blank" rel="noopener">iex</a>가
+그렇다. 물론 래퍼로 감싸서 <a href="https://gist.github.com/jfreeze/8894279" target="_blank" rel="noopener">우회해서 사용</a>할
+수는 있지만, 리스크 관리는 알아서;</p>
+<p>vi mode는 있는데 명령을 사용할 수 없는 경우도 있다. fish에서는 <code>esc v</code>가
+동작하지 않는다.</p>
+<h1 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h1><ul>
+<li><a href="https://linux.die.net/man/3/readline" target="_blank" rel="noopener">https://linux.die.net/man/3/readline</a></li>
+<li><a href="https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md" target="_blank" rel="noopener">https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md</a></li>
+</ul>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/bash/">bash</a><a href="/tags/vim/">vim</a><a href="/tags/shell/">shell</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+
+
+  <article>
+
+  
+    
+    <h3 class="article-title"><a href="/2016/09/20/elixir-tips-from-exercism/"><span>Elixir tips from exercism</span></a></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/20/elixir-tips-from-exercism/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-19T15:00:00.000Z">
+          2016-09-20
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="재귀"><a href="#재귀" class="headerlink" title="재귀"></a>재귀</h1><p>다른 언어하다와서 성능이 안좋을거라는 선입견에 가능하면 안쓰려고 했는데 괜한
+걱정이었다. 오히려
+<a href="http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2" target="_blank" rel="noopener"><code>Enum</code></a>
+사용하는 쪽이 느릴 때가 많았다.</p>
+<h1 id="for-문"><a href="#for-문" class="headerlink" title="for 문"></a>for 문</h1><p><a href="http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2" target="_blank" rel="noopener"><code>Enum.flat_map/2</code></a>
+대신 쓸 수 있다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line">min..(max - <span class="number">2</span>)</span><br><span class="line">|&gt; Enum.flat_map(<span class="keyword">fn</span> x -&gt;</span><br><span class="line">  (x + <span class="number">1</span>)..(max - <span class="number">1</span>)</span><br><span class="line">  |&gt; Enum.flat_map(<span class="keyword">fn</span> y -&gt;</span><br><span class="line">    (y + <span class="number">1</span>)..max</span><br><span class="line">    |&gt; Enum.map(<span class="keyword">fn</span> z -&gt;</span><br><span class="line">      [x, y, z]</span><br><span class="line">    <span class="keyword">end</span>)</span><br><span class="line">  <span class="keyword">end</span>)</span><br><span class="line"><span class="keyword">end</span>)</span><br><span class="line">|&gt; Enum.filter(&amp;pythagorean?<span class="regexp">/1)</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp"># good</span></span><br><span class="line"><span class="regexp">for x &lt;- min..(max - 2),</span></span><br><span class="line"><span class="regexp">    y &lt;- (x + 1)..(max - 1),</span></span><br><span class="line"><span class="regexp">    z &lt;- (y + 1)..max,</span></span><br><span class="line"><span class="regexp">    pythagorean?([x, y, z]) do</span></span><br><span class="line"><span class="regexp">  [x, y, z]</span></span><br><span class="line"><span class="regexp">end</span></span><br></pre></td></tr></table></figure>
+<h1 id="인자-개수"><a href="#인자-개수" class="headerlink" title="인자 개수"></a>인자 개수</h1><p>줄일 수 있으면 줄여라. 짧고 읽기도 편하다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(0, acc), <span class="symbol">do:</span> acc</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(n, acc \\ []), <span class="symbol">do:</span> upto(n - <span class="number">1</span>, [n | acc])</span><br><span class="line"></span><br><span class="line"><span class="comment"># good</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(0), <span class="symbol">do:</span> []</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(n), <span class="symbol">do:</span> [n | upto(n - <span class="number">1</span>)]</span><br></pre></td></tr></table></figure>
+<h1 id="List"><a href="#List" class="headerlink" title="List"></a>List</h1><p>링크드 리스트는 배열과 다르다. 루비에서는 가능하면 배열을 적게 사용하려고
+노력했었는데 그럴 필요는 없다. 다만 zip한다던가 할게 아니면 튜플이 나을 때도
+있다.</p>
+<h1 id="with"><a href="#with" class="headerlink" title="with"></a>with</h1><p>갓갓돋는다. BDD감각으로 읽힌다.</p>
+<h1 id="amp-Shorthand"><a href="#amp-Shorthand" class="headerlink" title="&amp; Shorthand"></a>&amp; Shorthand</h1><p>&amp;로 함수 시작해서 인자 넘기는 패턴 밖에 몰랐는데, 인자도 생략할 수 있더라.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">~w(1 2 3)</span></span><br><span class="line">|&gt; Enum.map(&amp;String.to_integer(&amp;<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># equals to</span></span><br><span class="line"><span class="string">~w(1 2 3)</span></span><br><span class="line">|&gt; Enum.map(&amp;String.to_integer/<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="transpose"><a href="#transpose" class="headerlink" title="transpose"></a>transpose</h1><p>이게 왜없나 싶은데.. 만들 수는 있다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transpose</span></span>([[]|_]), <span class="symbol">do:</span> []</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transpose</span></span>(list) <span class="keyword">do</span></span><br><span class="line">  [Enum.map(list, &amp;hd/<span class="number">1</span>) | transpose(Enum.map(list, &amp;tl/<span class="number">1</span>))]</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transpose</span></span>(list) <span class="keyword">do</span></span><br><span class="line">  list |&gt; List.zip |&gt; Enum.map(&amp;Tuple.to_list/<span class="number">1</span>)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h1 id="디스트럭쳐링"><a href="#디스트럭쳐링" class="headerlink" title="디스트럭쳐링"></a>디스트럭쳐링</h1><p>패턴 매칭이라 기본적으로 되는데 튜플은 개수 맞춰야하는 거만 좀 조심하면 된다.
+맵이 좀 적기 귀찮은데 신텍스 슈가 같은게 있으면 좋겠다. 있는데 나만 모르는 걸
+수도 있고..</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[a, b, c] = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">[a | _] = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">&#123;a, b, c&#125; = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;</span><br><span class="line">&#123;a, _, _&#125; = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;</span><br><span class="line">&#123;a, _&#125; = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125; <span class="comment"># error</span></span><br><span class="line"></span><br><span class="line">%&#123;<span class="symbol">a:</span> a, <span class="symbol">b:</span> b&#125; = %&#123;<span class="symbol">a:</span> <span class="number">1</span>, <span class="symbol">b:</span> <span class="number">2</span>&#125;</span><br><span class="line">%&#123;<span class="symbol">a:</span> a&#125; = %&#123;<span class="symbol">a:</span> <span class="number">1</span>, <span class="symbol">b:</span> <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="state"><a href="#state" class="headerlink" title="state"></a>state</h1><p>루비에서는 간단하게 돼는데 할일이 많아졌다. 요런 코드가있다고 하자.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">initialize</span></span></span><br><span class="line">    @number = <span class="number">0</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">up</span></span></span><br><span class="line">    @number += <span class="number">1</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>이걸 엘릭서에서 하려면 이렇게 된다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">defmodule</span> <span class="title">Counter</span></span> <span class="keyword">do</span></span><br><span class="line">  <span class="keyword">use</span> GenServer</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">handle_call</span></span>(<span class="symbol">:up</span>, _from, state) <span class="keyword">do</span></span><br><span class="line">    &#123;<span class="symbol">:reply</span>, state + <span class="number">1</span>, state + <span class="number">1</span>&#125;</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="symbol">:ok</span>, pid&#125; = GenServer.start_link(Counter, 0)</span><br><span class="line">GenServer.call(pid, <span class="symbol">:up</span>)</span><br></pre></td></tr></table></figure>
+<p>뭔가 더 단순하게 할 수있는 방법이 있었으면 좋겠다.</p>
+<h1 id="그밖에"><a href="#그밖에" class="headerlink" title="그밖에"></a>그밖에</h1><p>가능하면 파이프써라.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line">[h] ++ t</span><br><span class="line"></span><br><span class="line"><span class="comment"># good</span></span><br><span class="line">[h | t]</span><br></pre></td></tr></table></figure>
+<p>까먹을 때가 가끔있는데 List.Chars.t는 Enum.t다.
+그냥 홀따옴표 표기로 적어도 Enum돌릴 수 있으니 길게 풀어쓸 필요는 없다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line">?A <span class="keyword">in</span> [?A, ?B, ?C]</span><br><span class="line">[?A, ?B, ?C]</span><br><span class="line">|&gt; Enum.all?(&amp;(&amp;<span class="number">1</span> &lt; ?D))</span><br><span class="line"></span><br><span class="line"><span class="comment"># good</span></span><br><span class="line">?A <span class="keyword">in</span> <span class="string">'ABC'</span></span><br><span class="line"><span class="string">'ABC'</span></span><br><span class="line">|&gt; Enum.all?(&amp;(&amp;<span class="number">1</span> &lt; ?D))</span><br></pre></td></tr></table></figure>
+<p><code>to_integer(float)</code>가 없다. 다들
+<a href="http://erlang.org/doc/man/erlang.html#round-1" target="_blank" rel="noopener"><code>round(Number)</code></a> 사용하는 듯
+하다.</p>
+<p>스트링을 파이프로 넘겨야 할 때는
+<a href="http://elixir-lang.org/docs/stable/elixir/Regex.html#replace/4" target="_blank" rel="noopener"><code>Regex.replace/4</code></a>
+대신
+<a href="http://elixir-lang.org/docs/stable/elixir/String.html#replace/4" target="_blank" rel="noopener"><code>String.replace/4</code></a>
+쓰면 된다. 인자 순서만 다르고 기본적으로 같은 함수다.</p>
+<h1 id="수정-이력"><a href="#수정-이력" class="headerlink" title="수정 이력"></a>수정 이력</h1><p>9월 23일: 오타 수정, 링크 추가
+9월 28일: 항목 추가</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/elixir/">elixir</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+
+
+
+<nav class="pagination">
+  
+  <a href="/" class="pagination-prev">Prev</a>
+  
+  
+</nav>
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

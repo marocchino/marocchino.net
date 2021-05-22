@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>id를 사용하는 컬럼을 저장하려면 | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="에초에 이런 모델이있었다.
+12class Product &amp;lt; ApplicationRecordend
+url에 아이디 대신 상품 코드를 표시하고 싶다는 요구사항이 추가 되었다.
+뭐 이정도야 껌이지.
+123456789class Product &amp;lt; Application">
+  
+
+  
+  
+  <meta name="keywords" content="ruby,rails">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="id를 사용하는 컬럼을 저장하려면"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>id를 사용하는 컬럼을 저장하려면</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2017/08/26/to-save-a-column-using-id/" rel="bookmark">
+        <time class="entry-date published" datetime="2017-08-26T08:54:15.000Z">
+          2017-08-26
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>에초에 이런 모델이있었다.</p>
+<figure class="highlight rb"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &lt; ApplicationRecord</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>url에 아이디 대신 상품 코드를 표시하고 싶다는 요구사항이 추가 되었다.
+뭐 이정도야 껌이지.</p>
+<figure class="highlight rb"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &lt; ApplicationRecord</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">find_by_code</span><span class="params">(code)</span></span></span><br><span class="line">    find(code.sub(<span class="regexp">/\AC0+/</span>, <span class="string">''</span>))</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">code</span></span></span><br><span class="line">    <span class="string">"C<span class="subst">#&#123;id.to_s.rjust(<span class="number">7</span>, <span class="string">'0'</span>)&#125;</span>"</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>코드를 커스터마이징 하고싶다는 요구사항이 추가되었다.
+DB에 저장해야하는데 <code>before_create</code> 시점에서는 모델의 아이디를 뽑을 수 없다.
+저장을 두번 하는게 신경쓰이긴하지만 어쩔수 없지 <code>after_save</code> 인가.</p>
+<figure class="highlight rb"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &lt; ApplicationRecord</span></span><br><span class="line">  after_create <span class="symbol">:generate_code</span></span><br><span class="line"></span><br><span class="line">  private</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">generate_code</span></span></span><br><span class="line">    <span class="keyword">self</span>.code <span class="params">||</span>= <span class="string">"C<span class="subst">#&#123;id.to_s.rjust(<span class="number">7</span>, <span class="string">'0'</span>)&#125;</span>"</span></span><br><span class="line">    throw(<span class="symbol">:abort</span>) <span class="keyword">unless</span> save</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>테스트를 돌려보면 워닝이 대량 발생한다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DEPRECATION WARNING: The behavior of attribute_changed? inside of after...</span><br><span class="line">.DEPRECATION WARNING: The behavior of attribute_changed? inside of after...</span><br><span class="line">.DEPRECATION WARNING: The behavior of attribute_changed? inside of after...</span><br><span class="line">.DEPRECATION WARNING: The behavior of attribute_changed? inside of after...</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>으으.. 이건 <code>save</code>안에서 업데이트할 컬럼을 찾기위해 <code>attribute_changed?</code>를
+부르기 때문이다.  성능에도 안좋고 좀 진지하게 검색해서 <code>before_create</code>로 옮기는
+대신 아이디를 직접뽑는 방향으로 전환.</p>
+<figure class="highlight rb"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Product</span> &lt; ApplicationRecord</span></span><br><span class="line">  before_create <span class="symbol">:generate_id_and_code</span></span><br><span class="line"></span><br><span class="line">  private</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">generate_id_and_code</span></span></span><br><span class="line">    <span class="keyword">self</span>.id <span class="params">||</span>=</span><br><span class="line">      <span class="keyword">self</span><span class="class">.<span class="keyword">class</span>.<span class="title">connection</span></span></span><br><span class="line">      .select_value(<span class="string">"select nextval('<span class="subst">#&#123;<span class="keyword">self</span><span class="class">.<span class="keyword">class</span>.<span class="title">sequence_name</span>&#125;')")</span></span></span></span><br><span class="line"><span class="string"><span class="subst">    <span class="keyword">self</span>.code = <span class="string">"C<span class="subst">#&#123;id.to_s.rjust(<span class="number">7</span>, <span class="string">'0'</span>)&#125;</span>"</span> <span class="keyword">unless</span> code?</span></span></span><br><span class="line"><span class="string"><span class="subst">  <span class="keyword">end</span></span></span></span><br><span class="line"><span class="string"><span class="subst"><span class="keyword">end</span></span></span></span><br></pre></td></tr></table></figure>
+<p>이제 저장도 한번하고 테스트돌려도 워닝안나온다.
+만족</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/ruby/">ruby</a><a href="/tags/rails/">rails</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

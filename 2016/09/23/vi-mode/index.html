@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>vi-mode | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="tl;drRTFM
+동기처음에는 이맥스 단축키 외우기 귀찮고 빔이 더 편하지 않을까 정도로 쓰기
+시작했다만, 한 2년간 사용했는데도 인터프리터랄께 셸마다 미묘하게 동작이 틀리기도
+하고 아예 사용할 수 없는 경우도 있어서 그냥 이맥스 모드도 익숙해져버렸다.
+익히고 까먹고 ">
+  
+
+  
+  
+  <meta name="keywords" content="bash,vim,shell">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="vi-mode"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>vi-mode</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/23/vi-mode/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-22T18:57:49.000Z">
+          2016-09-23
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="tl-dr"><a href="#tl-dr" class="headerlink" title="tl;dr"></a>tl;dr</h1><p>RTFM</p>
+<h1 id="동기"><a href="#동기" class="headerlink" title="동기"></a>동기</h1><p>처음에는 이맥스 단축키 외우기 귀찮고 빔이 더 편하지 않을까 정도로 쓰기
+시작했다만, 한 2년간 사용했는데도 인터프리터랄께 셸마다 미묘하게 동작이 틀리기도
+하고 아예 사용할 수 없는 경우도 있어서 그냥 이맥스 모드도 익숙해져버렸다.</p>
+<p>익히고 까먹고 익히고 까먹고를 반복하고 있어서 정리할 겸..</p>
+<h1 id="설정"><a href="#설정" class="headerlink" title="설정"></a>설정</h1><p>기본적으로는 <code>.inputrc</code>에 추가 하기만 하면 된다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> editing-mode vi</span><br></pre></td></tr></table></figure>
+<p>다만, <code>fzf</code>를 사용한다면 <a href="https://github.com/junegunn/fzf/issues/39" target="_blank" rel="noopener">오동작</a>이
+생기니 <code>.bashrc</code>에서 로드하기 전에 한번 더 설정해줘야 한다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> -o vi</span><br><span class="line">[ -f ~/.fzf.bash ] &amp;&amp; <span class="built_in">source</span> ~/.fzf.bash</span><br></pre></td></tr></table></figure>
+<p>이것만해도 사용하는데는 크게 문제 없는데, 가끔 지금 어떤 모드에 있는지 몰라서
+삽질할 때가 있으니 프롬프트에 현재 상태를 표시하게 해뒀다.
+<code>.inputrc</code>에 추가로..</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> show-mode-in-prompt on</span><br><span class="line"><span class="built_in">set</span> vi-ins-mode-string \1\e[34;1m\2✚ \1\e[0m\2</span><br><span class="line"><span class="built_in">set</span> vi-cmd-mode-string \1\e[35;1m\2: \1\e[0m\2</span><br></pre></td></tr></table></figure>
+<h1 id="사용하기"><a href="#사용하기" class="headerlink" title="사용하기"></a>사용하기</h1><p>전채 목록은 <a href="https://linux.die.net/man/3/readline" target="_blank" rel="noopener">readline</a>의 Default Key
+Bindings 항목을 읽어보면 된다. 이정도는 알아 둘만 한 것들만 뽑아봤다.</p>
+<table>
+<thead>
+<tr>
+<th>명령</th>
+<th>이맥스</th>
+<th>빔</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>맨 앞으로 이동</td>
+<td>ctrl-a</td>
+<td>esc I</td>
+</tr>
+<tr>
+<td>맨 뒤로 이동</td>
+<td>ctrl-e</td>
+<td>esc A</td>
+</tr>
+<tr>
+<td>단어단위 앞으로 이동</td>
+<td>ctrl-b</td>
+<td>esc b</td>
+</tr>
+<tr>
+<td>단어단위 뒤로 이동</td>
+<td>ctrl-f</td>
+<td>esc w</td>
+</tr>
+<tr>
+<td>커서위치부터 뒤 삭제</td>
+<td>ctrl-k</td>
+<td>esc D</td>
+</tr>
+<tr>
+<td>에디터에서 열기</td>
+<td>ctrl-x ctrl-e</td>
+<td>esc v</td>
+</tr>
+<tr>
+<td>히스토리 검색</td>
+<td>ctrl-r</td>
+<td>ctrl-r</td>
+</tr>
+<tr>
+<td>주석 처리</td>
+<td>alt-#</td>
+<td>esc I#</td>
+</tr>
+<tr>
+<td>클리어</td>
+<td>ctrl-l</td>
+<td>esc ctrl-l</td>
+</tr>
+</tbody>
+</table>
+<h1 id="문제점"><a href="#문제점" class="headerlink" title="문제점"></a>문제점</h1><p>아까도 말했는데 몇몇 콘솔은 vi mode를 무시한다. 대표적으로
+<a href="http://stackoverflow.com/questions/11976765/erlang-interpreter-vi-mode" target="_blank" rel="noopener">Erlang</a>하고
+그 위에서 돌아가는 <a href="https://github.com/elixir-lang/elixir/issues/4533" target="_blank" rel="noopener">iex</a>가
+그렇다. 물론 래퍼로 감싸서 <a href="https://gist.github.com/jfreeze/8894279" target="_blank" rel="noopener">우회해서 사용</a>할
+수는 있지만, 리스크 관리는 알아서;</p>
+<p>vi mode는 있는데 명령을 사용할 수 없는 경우도 있다. fish에서는 <code>esc v</code>가
+동작하지 않는다.</p>
+<h1 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h1><ul>
+<li><a href="https://linux.die.net/man/3/readline" target="_blank" rel="noopener">https://linux.die.net/man/3/readline</a></li>
+<li><a href="https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md" target="_blank" rel="noopener">https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md</a></li>
+</ul>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/bash/">bash</a><a href="/tags/vim/">vim</a><a href="/tags/shell/">shell</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

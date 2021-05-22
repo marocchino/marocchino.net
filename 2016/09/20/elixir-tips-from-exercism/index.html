@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Elixir tips from exercism | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="재귀다른 언어하다와서 성능이 안좋을거라는 선입견에 가능하면 안쓰려고 했는데 괜한
+걱정이었다. 오히려
+Enum
+사용하는 쪽이 느릴 때가 많았다.
+for 문Enum.flat_map/2
+대신 쓸 수 있다.
+1234567891011121314151617181920# badmi">
+  
+
+  
+  
+  <meta name="keywords" content="elixir">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Elixir tips from exercism"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>Elixir tips from exercism</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/20/elixir-tips-from-exercism/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-19T15:00:00.000Z">
+          2016-09-20
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <h1 id="재귀"><a href="#재귀" class="headerlink" title="재귀"></a>재귀</h1><p>다른 언어하다와서 성능이 안좋을거라는 선입견에 가능하면 안쓰려고 했는데 괜한
+걱정이었다. 오히려
+<a href="http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2" target="_blank" rel="noopener"><code>Enum</code></a>
+사용하는 쪽이 느릴 때가 많았다.</p>
+<h1 id="for-문"><a href="#for-문" class="headerlink" title="for 문"></a>for 문</h1><p><a href="http://elixir-lang.org/docs/stable/elixir/Enum.html#flat_map/2" target="_blank" rel="noopener"><code>Enum.flat_map/2</code></a>
+대신 쓸 수 있다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line">min..(max - <span class="number">2</span>)</span><br><span class="line">|&gt; Enum.flat_map(<span class="keyword">fn</span> x -&gt;</span><br><span class="line">  (x + <span class="number">1</span>)..(max - <span class="number">1</span>)</span><br><span class="line">  |&gt; Enum.flat_map(<span class="keyword">fn</span> y -&gt;</span><br><span class="line">    (y + <span class="number">1</span>)..max</span><br><span class="line">    |&gt; Enum.map(<span class="keyword">fn</span> z -&gt;</span><br><span class="line">      [x, y, z]</span><br><span class="line">    <span class="keyword">end</span>)</span><br><span class="line">  <span class="keyword">end</span>)</span><br><span class="line"><span class="keyword">end</span>)</span><br><span class="line">|&gt; Enum.filter(&amp;pythagorean?<span class="regexp">/1)</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp"># good</span></span><br><span class="line"><span class="regexp">for x &lt;- min..(max - 2),</span></span><br><span class="line"><span class="regexp">    y &lt;- (x + 1)..(max - 1),</span></span><br><span class="line"><span class="regexp">    z &lt;- (y + 1)..max,</span></span><br><span class="line"><span class="regexp">    pythagorean?([x, y, z]) do</span></span><br><span class="line"><span class="regexp">  [x, y, z]</span></span><br><span class="line"><span class="regexp">end</span></span><br></pre></td></tr></table></figure>
+<h1 id="인자-개수"><a href="#인자-개수" class="headerlink" title="인자 개수"></a>인자 개수</h1><p>줄일 수 있으면 줄여라. 짧고 읽기도 편하다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(0, acc), <span class="symbol">do:</span> acc</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(n, acc \\ []), <span class="symbol">do:</span> upto(n - <span class="number">1</span>, [n | acc])</span><br><span class="line"></span><br><span class="line"><span class="comment"># good</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(0), <span class="symbol">do:</span> []</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upto</span></span>(n), <span class="symbol">do:</span> [n | upto(n - <span class="number">1</span>)]</span><br></pre></td></tr></table></figure>
+<h1 id="List"><a href="#List" class="headerlink" title="List"></a>List</h1><p>링크드 리스트는 배열과 다르다. 루비에서는 가능하면 배열을 적게 사용하려고
+노력했었는데 그럴 필요는 없다. 다만 zip한다던가 할게 아니면 튜플이 나을 때도
+있다.</p>
+<h1 id="with"><a href="#with" class="headerlink" title="with"></a>with</h1><p>갓갓돋는다. BDD감각으로 읽힌다.</p>
+<h1 id="amp-Shorthand"><a href="#amp-Shorthand" class="headerlink" title="&amp; Shorthand"></a>&amp; Shorthand</h1><p>&amp;로 함수 시작해서 인자 넘기는 패턴 밖에 몰랐는데, 인자도 생략할 수 있더라.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">~w(1 2 3)</span></span><br><span class="line">|&gt; Enum.map(&amp;String.to_integer(&amp;<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># equals to</span></span><br><span class="line"><span class="string">~w(1 2 3)</span></span><br><span class="line">|&gt; Enum.map(&amp;String.to_integer/<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="transpose"><a href="#transpose" class="headerlink" title="transpose"></a>transpose</h1><p>이게 왜없나 싶은데.. 만들 수는 있다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transpose</span></span>([[]|_]), <span class="symbol">do:</span> []</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transpose</span></span>(list) <span class="keyword">do</span></span><br><span class="line">  [Enum.map(list, &amp;hd/<span class="number">1</span>) | transpose(Enum.map(list, &amp;tl/<span class="number">1</span>))]</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transpose</span></span>(list) <span class="keyword">do</span></span><br><span class="line">  list |&gt; List.zip |&gt; Enum.map(&amp;Tuple.to_list/<span class="number">1</span>)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h1 id="디스트럭쳐링"><a href="#디스트럭쳐링" class="headerlink" title="디스트럭쳐링"></a>디스트럭쳐링</h1><p>패턴 매칭이라 기본적으로 되는데 튜플은 개수 맞춰야하는 거만 좀 조심하면 된다.
+맵이 좀 적기 귀찮은데 신텍스 슈가 같은게 있으면 좋겠다. 있는데 나만 모르는 걸
+수도 있고..</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[a, b, c] = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">[a | _] = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">&#123;a, b, c&#125; = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;</span><br><span class="line">&#123;a, _, _&#125; = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;</span><br><span class="line">&#123;a, _&#125; = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125; <span class="comment"># error</span></span><br><span class="line"></span><br><span class="line">%&#123;<span class="symbol">a:</span> a, <span class="symbol">b:</span> b&#125; = %&#123;<span class="symbol">a:</span> <span class="number">1</span>, <span class="symbol">b:</span> <span class="number">2</span>&#125;</span><br><span class="line">%&#123;<span class="symbol">a:</span> a&#125; = %&#123;<span class="symbol">a:</span> <span class="number">1</span>, <span class="symbol">b:</span> <span class="number">2</span>&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="state"><a href="#state" class="headerlink" title="state"></a>state</h1><p>루비에서는 간단하게 돼는데 할일이 많아졌다. 요런 코드가있다고 하자.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">initialize</span></span></span><br><span class="line">    @number = <span class="number">0</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">up</span></span></span><br><span class="line">    @number += <span class="number">1</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>이걸 엘릭서에서 하려면 이렇게 된다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">defmodule</span> <span class="title">Counter</span></span> <span class="keyword">do</span></span><br><span class="line">  <span class="keyword">use</span> GenServer</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">handle_call</span></span>(<span class="symbol">:up</span>, _from, state) <span class="keyword">do</span></span><br><span class="line">    &#123;<span class="symbol">:reply</span>, state + <span class="number">1</span>, state + <span class="number">1</span>&#125;</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="symbol">:ok</span>, pid&#125; = GenServer.start_link(Counter, 0)</span><br><span class="line">GenServer.call(pid, <span class="symbol">:up</span>)</span><br></pre></td></tr></table></figure>
+<p>뭔가 더 단순하게 할 수있는 방법이 있었으면 좋겠다.</p>
+<h1 id="그밖에"><a href="#그밖에" class="headerlink" title="그밖에"></a>그밖에</h1><p>가능하면 파이프써라.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line">[h] ++ t</span><br><span class="line"></span><br><span class="line"><span class="comment"># good</span></span><br><span class="line">[h | t]</span><br></pre></td></tr></table></figure>
+<p>까먹을 때가 가끔있는데 List.Chars.t는 Enum.t다.
+그냥 홀따옴표 표기로 적어도 Enum돌릴 수 있으니 길게 풀어쓸 필요는 없다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bad</span></span><br><span class="line">?A <span class="keyword">in</span> [?A, ?B, ?C]</span><br><span class="line">[?A, ?B, ?C]</span><br><span class="line">|&gt; Enum.all?(&amp;(&amp;<span class="number">1</span> &lt; ?D))</span><br><span class="line"></span><br><span class="line"><span class="comment"># good</span></span><br><span class="line">?A <span class="keyword">in</span> <span class="string">'ABC'</span></span><br><span class="line"><span class="string">'ABC'</span></span><br><span class="line">|&gt; Enum.all?(&amp;(&amp;<span class="number">1</span> &lt; ?D))</span><br></pre></td></tr></table></figure>
+<p><code>to_integer(float)</code>가 없다. 다들
+<a href="http://erlang.org/doc/man/erlang.html#round-1" target="_blank" rel="noopener"><code>round(Number)</code></a> 사용하는 듯
+하다.</p>
+<p>스트링을 파이프로 넘겨야 할 때는
+<a href="http://elixir-lang.org/docs/stable/elixir/Regex.html#replace/4" target="_blank" rel="noopener"><code>Regex.replace/4</code></a>
+대신
+<a href="http://elixir-lang.org/docs/stable/elixir/String.html#replace/4" target="_blank" rel="noopener"><code>String.replace/4</code></a>
+쓰면 된다. 인자 순서만 다르고 기본적으로 같은 함수다.</p>
+<h1 id="수정-이력"><a href="#수정-이력" class="headerlink" title="수정 이력"></a>수정 이력</h1><p>9월 23일: 오타 수정, 링크 추가
+9월 28일: 항목 추가</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/elixir/">elixir</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

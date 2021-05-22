@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Bash tips | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="안적어두면 자꾸까먹어서 정리할 겸..
+여러 파일 치환이런 작업은 vim에서 하는거보다는 밖에서 하는게 빠르고 정규식도 POSIX라 편하다.
+오타 수정할 때 쓰면 좋다.
+1perl -pi -e &#39;s/old-string/new-string/g&#39; my-files-*.txt
+">
+  
+
+  
+  
+  <meta name="keywords" content="bash,fish">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="Bash tips"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>Bash tips</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/09/29/bash-tips/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-09-29T06:13:26.000Z">
+          2016-09-29
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>안적어두면 자꾸까먹어서 정리할 겸..</p>
+<h1 id="여러-파일-치환"><a href="#여러-파일-치환" class="headerlink" title="여러 파일 치환"></a>여러 파일 치환</h1><p>이런 작업은 vim에서 하는거보다는 밖에서 하는게 빠르고 정규식도 POSIX라 편하다.
+오타 수정할 때 쓰면 좋다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl -pi -e <span class="string">'s/old-string/new-string/g'</span> my-files-*.txt</span><br></pre></td></tr></table></figure>
+<p>조금 덧붙여서 커밋된 파일만 순회할 수도 있다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl -pi -e <span class="string">'s/old-string/new-string/g'</span> $(git ls-tree HEAD --name-only -r)</span><br></pre></td></tr></table></figure>
+<p>특정 폴더만 지정하려면 – 쓰면된다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">perl -pi -e <span class="string">'s/old-string/new-string/g'</span> \</span><br><span class="line">  $(git ls-tree HEAD --name-only -r -- ./folder)</span><br></pre></td></tr></table></figure>
+<h1 id="clipboard-내용으로-사전열기"><a href="#clipboard-내용으로-사전열기" class="headerlink" title="clipboard 내용으로 사전열기"></a>clipboard 내용으로 사전열기</h1><p>번역하고 있을때 유용하게 쓴다.
+OSX한정이고 bash tip이 아닐지도 모르겠는데 이렇게 한다.
+alias로 해두면 세손가락 더블탭보다 스트로크가 적다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open -a /Applications/Dictionary.app/ --args $(pbpaste)</span><br></pre></td></tr></table></figure>
+<h1 id="패턴에-따라-여러파일-지정하기"><a href="#패턴에-따라-여러파일-지정하기" class="headerlink" title="패턴에 따라 여러파일 지정하기"></a>패턴에 따라 여러파일 지정하기</h1><p>디렉토리 구조가 비슷하다거나. 확장자만 조금 다르거나 할 때 사용할 수있다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim &#123;ko,.&#125;/lessions/basic/test.md</span><br><span class="line">vim readme.&#123;ko,en&#125;.md</span><br></pre></td></tr></table></figure>
+<h1 id="if-statement"><a href="#if-statement" class="headerlink" title="if statement"></a>if statement</h1><p>기본적으로 이렇다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="keyword">if</span> [[ condition ]]; <span class="keyword">then</span></span><br><span class="line">  something</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  something</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+<p>구문은 딱히 특별할거 없고, condition만 신경쓰면 된다.</p>
+<table>
+<thead>
+<tr>
+<th>명령</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>! 표현식</td>
+<td>표현식이 참이 아님</td>
+</tr>
+<tr>
+<td>-n 문자열</td>
+<td>문자열의 길이가 0보다 큼</td>
+</tr>
+<tr>
+<td>-z 문자열</td>
+<td>문자열의 길이가 0</td>
+</tr>
+<tr>
+<td>문자열1 = 문자열2</td>
+<td>두문자열이 같음</td>
+</tr>
+<tr>
+<td>문자열1 != 문자열2</td>
+<td>두문자열이 다름</td>
+</tr>
+<tr>
+<td>숫자1 -eq 숫자2</td>
+<td>두숫자가 같음</td>
+</tr>
+<tr>
+<td>숫자1 -ne 숫자2</td>
+<td>두숫자가 다름</td>
+</tr>
+<tr>
+<td>숫자1 -gt 숫자2</td>
+<td>숫자1이 숫자2보다 큼</td>
+</tr>
+<tr>
+<td>숫자1 -lt 숫자2</td>
+<td>숫자1이 숫자2보다 작음</td>
+</tr>
+<tr>
+<td>-d 파일</td>
+<td>디렉토리가 있음</td>
+</tr>
+<tr>
+<td>-e 파일</td>
+<td>파일이 있음</td>
+</tr>
+<tr>
+<td>-r 파일</td>
+<td>파일이 있고 읽기권한이 있음</td>
+</tr>
+<tr>
+<td>-s 파일</td>
+<td>파일이 있고 크기가 0보다 큼</td>
+</tr>
+<tr>
+<td>-w 파일</td>
+<td>파일이 있고 쓰기권한이 있음</td>
+</tr>
+<tr>
+<td>-x 파일</td>
+<td>파일이 있고 실행권한이 있음</td>
+</tr>
+</tbody>
+</table>
+<h1 id="변수들"><a href="#변수들" class="headerlink" title="$변수들"></a>$변수들</h1><table>
+<thead>
+<tr>
+<th>표현</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$0</td>
+<td>셸스크립트 이름</td>
+</tr>
+<tr>
+<td>$1</td>
+<td>첫 번째 인자</td>
+</tr>
+<tr>
+<td>$2</td>
+<td>두 번째 인자</td>
+</tr>
+<tr>
+<td>$@</td>
+<td>인자 배열</td>
+</tr>
+<tr>
+<td>$#</td>
+<td>인자 개수</td>
+</tr>
+</tbody>
+</table>
+<h1 id="기본값-설정하기"><a href="#기본값-설정하기" class="headerlink" title="기본값 설정하기"></a>기본값 설정하기</h1><p>변수가 할당안됐을 기본값을 지정할 수 있다. if문을 줄이려할 때 유용.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> Hello, <span class="variable">$&#123;NAME-World&#125;</span>! <span class="comment"># =&gt; Hello, World!</span></span><br><span class="line">NAME=Alice</span><br><span class="line"><span class="built_in">echo</span> Hello, <span class="variable">$&#123;NAME-World&#125;</span>! <span class="comment"># =&gt; Hello, Alice!</span></span><br></pre></td></tr></table></figure>
+<h1 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h1><p><a href="https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html" target="_blank" rel="noopener">https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html</a>
+<a href="http://www.tldp.org/LDP/abs/html/parameter-substitution.html" target="_blank" rel="noopener">http://www.tldp.org/LDP/abs/html/parameter-substitution.html</a>
+<a href="https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md" target="_blank" rel="noopener">https://github.com/jlevy/the-art-of-command-line/blob/master/README-ko.md</a></p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/bash/">bash</a><a href="/tags/fish/">fish</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

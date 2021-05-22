@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>rspec 잘쓰고 계신가요? | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="이 글은 루비 대림 달력용으로
+작성하는 글 입니다.
+
+3일: Ruby 2.4.0 Preview
+5일: puma 웹서버 주기적으로 재시작
+
+tl;dr: Given, When, Then 단위로 나누어서 작성하세요.
+rspec은설명할 것도 없이 레일스를 사용한다면 한번은 봤">
+  
+
+  
+  
+  <meta name="keywords" content="ruby,rspec,bdd">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="rspec 잘쓰고 계신가요?"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>rspec 잘쓰고 계신가요?</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/12/04/about-rspec/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-12-04T01:00:00.000Z">
+          2016-12-04
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>이 글은 <a href="http://ruby-korea.github.io/advent-calendar/" target="_blank" rel="noopener">루비 대림 달력</a>용으로
+작성하는 글 입니다.</p>
+<ul>
+<li><a href="http://riseshia.github.io/2016/12/01/ruby-2-4-0-preview.html" target="_blank" rel="noopener">3일: Ruby 2.4.0 Preview</a></li>
+<li><a href="https://code.iamseapy.com/archives/38" target="_blank" rel="noopener">5일: puma 웹서버 주기적으로 재시작</a></li>
+</ul>
+<p>tl;dr: Given, When, Then 단위로 나누어서 작성하세요.</p>
+<h1 id="rspec은"><a href="#rspec은" class="headerlink" title="rspec은"></a>rspec은</h1><p>설명할 것도 없이 레일스를 사용한다면 한번은 봤을 법한 가장 대중적인 BDD테스트
+프레임 워크입니다.</p>
+<h1 id="BDD는-뭔가요"><a href="#BDD는-뭔가요" class="headerlink" title="BDD는 뭔가요"></a>BDD는 뭔가요</h1><p>사양을 기술에 집중하는 TDD의 확장입니다. 루비에서는 rspec말고도 minitest-spec,
+cucumber, rspec-feature등을 사용해 할 수도 있습니다. 특정 서브젝트에 대해 조건을
+주고 그 결과를 확인하는 3단계로 나누어 작성하는게 특징입니다. 에러를 읽기도 쉽고
+찾기도 쉽죠.</p>
+<h1 id="코드로-이야기-합시다"><a href="#코드로-이야기-합시다" class="headerlink" title="코드로 이야기 합시다"></a>코드로 이야기 합시다</h1><p>다음과 같은 사양서의 테스트를 작성해 봅시다.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">기능: Stack</span><br><span class="line"></span><br><span class="line">조건 새 스택을 만듬</span><br><span class="line">그러면 비어있음</span><br><span class="line"></span><br><span class="line">만일 스택에 요소가 추가됨</span><br><span class="line">그러면 그 요소가 스택의 제일 위에 위치함</span><br><span class="line"></span><br><span class="line">만일 스택이 N개의 요소를 가짐</span><br><span class="line">그리고 요소 E가 스택의 제일 위에 위치함</span><br><span class="line">그러면 팝 연산은 E를 반환함</span><br><span class="line">그리고 새 스택 크기는 N-1이 됨</span><br></pre></td></tr></table></figure>
+<p>먼저 minitest로 작성해 보면 이렇게 될 것 같습니다.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StackTest</span> &lt; Minitest::Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">setup</span></span></span><br><span class="line">    @stack = Stack.new</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">test_new</span></span></span><br><span class="line">    assert @stack.empty?</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">test_add</span></span></span><br><span class="line">    @stack.add(<span class="string">"A"</span>)</span><br><span class="line">    assert_equal <span class="string">"A"</span>, @stack.top</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">test_pop</span></span></span><br><span class="line">    elements = <span class="string">%w(A B C D E)</span></span><br><span class="line">    elements.each &#123; <span class="params">|e|</span> @stack.add(e) &#125;</span><br><span class="line">    assert_equal <span class="string">"E"</span>, @stack.pop</span><br><span class="line">    assert_equal <span class="number">4</span>, @stack.size</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>일단 있는 그대로 rspec문법으로 옮겨보죠.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">RSpec.describe Stack <span class="keyword">do</span></span><br><span class="line">  subject(<span class="symbol">:stack</span>) &#123; Stack.new &#125;</span><br><span class="line"></span><br><span class="line">  it <span class="string">".new"</span> <span class="keyword">do</span></span><br><span class="line">    is_expected.to be_empty</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  it <span class="string">"#top"</span> <span class="keyword">do</span></span><br><span class="line">    stack.add(<span class="string">"A"</span>)</span><br><span class="line">    expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  it <span class="string">"#pop"</span> <span class="keyword">do</span></span><br><span class="line">    elements = <span class="string">%w(A B C D E)</span></span><br><span class="line">    elements.each &#123; <span class="params">|e|</span> stack.add(e) &#125;</span><br><span class="line">    expect(stack.pop).to eq <span class="string">"E"</span></span><br><span class="line">    expect(stack.size).to be <span class="number">4</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>TDD일때는 문제가 안되지만, 이런 코드는 설명을 코드의 구현에 의존하기 때문에
+설명충이 미덕인 BDD로써는 좋은 코드가 아닙니다. 단계별로 개선해 봅시다.</p>
+<h2 id="describe-사용하기"><a href="#describe-사용하기" class="headerlink" title="describe 사용하기"></a>describe 사용하기</h2><p>사양서의 Given에 해당하는 부분이고 테스트 할 대상을 지정할 때 사용하는 키워드
+입니다. 이미 Stack이 describe 되어있긴 하지만, 관례대로 클래스명 -&gt; 메서드명의
+두 단계로 넣어 무엇을 태스트하는지 좀 더 명확하게 하겠습니다.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">RSpec.describe Stack <span class="keyword">do</span></span><br><span class="line">  subject(<span class="symbol">:stack</span>) &#123; Stack.new &#125;</span><br><span class="line">  describe <span class="string">".new"</span> <span class="keyword">do</span></span><br><span class="line">    it <span class="string">"비어 있음"</span> <span class="keyword">do</span></span><br><span class="line">      expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  describe <span class="string">"#top"</span> <span class="keyword">do</span></span><br><span class="line">    it <span class="string">"만일 스택에 요소가 추가됨 그러면 그 요소가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">      stack.add(<span class="string">"A"</span>)</span><br><span class="line">      expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  describe <span class="string">"#pop"</span> <span class="keyword">do</span></span><br><span class="line">    it <span class="string">"만일 스택이 N개의 요소를 가짐 그리고 요소 E가 스택의 제일 위에 위치함"</span> \</span><br><span class="line">       <span class="string">"그러면 팝 연산은 E를 반환함 그리고 새 스택 크기는 N-1이 됨"</span> <span class="keyword">do</span></span><br><span class="line">      elements = <span class="string">%w(A B C D E)</span></span><br><span class="line">      elements.each &#123; <span class="params">|e|</span> stack.add(e) &#125;</span><br><span class="line">      expect(stack.pop).to eq <span class="string">"E"</span></span><br><span class="line">      expect(stack.size).to be <span class="number">4</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>아직 설명이 너무 길군요. 조금 더 분해해 봅시다.</p>
+<h2 id="context-사용하기"><a href="#context-사용하기" class="headerlink" title="context 사용하기"></a>context 사용하기</h2><p>조건을 정의할 때 사용합니다. 사양의 만일(When)에 해당하는 부분이죠.
+중요한 포인트는 context와 before를 하나의 묶음 처럼 생각하는 것입니다.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">describe <span class="string">"#top"</span> <span class="keyword">do</span></span><br><span class="line">  context <span class="string">"만일 스택에 요소가 추가됨"</span> <span class="keyword">do</span></span><br><span class="line">    before &#123; stack.add(<span class="string">"A"</span>) &#125;</span><br><span class="line">    it <span class="string">"그러면 그 요소가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">      expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">describe <span class="string">"#pop"</span> <span class="keyword">do</span></span><br><span class="line">  context <span class="string">"만일 스택이 N개의 요소를 가짐 그리고 요소 E가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">    before &#123; <span class="string">%w(A B C D E)</span>.each &#123; <span class="params">|e|</span> stack.add(e) &#125; &#125;</span><br><span class="line">    it <span class="string">"그러면 팝 연산은 E를 반환함 그리고 새 스택 크기는 N-1이 됨"</span> <span class="keyword">do</span></span><br><span class="line">      expect(stack.pop).to eq <span class="string">"E"</span></span><br><span class="line">      expect(stack.size).to be <span class="number">4</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="부작용-없에기"><a href="#부작용-없에기" class="headerlink" title="부작용 없에기"></a>부작용 없에기</h2><p>BDD의 세계에서는 실행 시간을 희생해서라도 부작용을 없에고 싶어합니다. it 하나에
+expect하나 이상 사용하는것은 좋지않은 징후죠. 나누어 보겠습니다.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">describe <span class="string">"#pop"</span> <span class="keyword">do</span></span><br><span class="line">  context <span class="string">"만일 스택이 N개의 요소를 가짐 그리고 요소 E가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">    before &#123; <span class="string">%w(A B C D E)</span>.each &#123; <span class="params">|e|</span> stack.add(e) &#125; &#125;</span><br><span class="line">    it <span class="string">"그러면 팝 연산은 E를 반환함"</span> <span class="keyword">do</span></span><br><span class="line">      expect(stack.pop).to eq <span class="string">"E"</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    it <span class="string">"그러면 팝연산 후의 새 스택 크기는 N-1이 됨"</span> <span class="keyword">do</span></span><br><span class="line">      stack.pop</span><br><span class="line">      expect(stack.size).to be <span class="number">4</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>이제 더 할일이 없어보이네요.</p>
+<h2 id="일단-완성"><a href="#일단-완성" class="headerlink" title="일단 완성"></a>일단 완성</h2><p>전체 코드는 이렇습니다.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">RSpec.describe Stack <span class="keyword">do</span></span><br><span class="line">  subject(<span class="symbol">:stack</span>) &#123; Stack.new &#125;</span><br><span class="line">  describe <span class="string">".new"</span> <span class="keyword">do</span></span><br><span class="line">    it <span class="string">"비어 있음"</span> <span class="keyword">do</span></span><br><span class="line">      expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  describe <span class="string">"#top"</span> <span class="keyword">do</span></span><br><span class="line">    context <span class="string">"만일 스택에 요소가 추가됨"</span> <span class="keyword">do</span></span><br><span class="line">      before &#123; stack.add(<span class="string">"A"</span>) &#125;</span><br><span class="line">      it <span class="string">"그러면 그 요소가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">        expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  describe <span class="string">"#pop"</span> <span class="keyword">do</span></span><br><span class="line">    context <span class="string">"만일 스택이 N개의 요소를 가짐 그리고 요소 E가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">      before &#123; <span class="string">%w(A B C D E)</span>.each &#123; <span class="params">|e|</span> stack.add(e) &#125; &#125;</span><br><span class="line">      it <span class="string">"그러면 팝 연산은 E를 반환함"</span> <span class="keyword">do</span></span><br><span class="line">        expect(stack.pop).to eq <span class="string">"E"</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">      it <span class="string">"그러면 팝연산 후의 새 스택 크기는 N-1이 됨"</span> <span class="keyword">do</span></span><br><span class="line">        stack.pop</span><br><span class="line">        expect(stack.size).to be <span class="number">4</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>보시는 것 처럼 TDD 스타일에 비해 자연어에 가깝게 적으려는 노오오력이 많이
+필요합니다. 하지만 내부 코드를 몰라도 단계적으로 조건의 설명이 명확히 되는건
+장점이라 할 수 있죠. 저는 이정도로 만족합니다만, 좀 더 bdd사양에 가깝게
+작성하시고 싶으시면 rspec-given이라는 dsl이 있긴 합니다.</p>
+<h2 id="rspec-given"><a href="#rspec-given" class="headerlink" title="rspec-given"></a>rspec-given</h2><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">RSpec.describe Stack <span class="keyword">do</span></span><br><span class="line">  Given(<span class="symbol">:stack</span>) &#123; Stack.new &#125;</span><br><span class="line">  describe <span class="string">".new"</span> <span class="keyword">do</span></span><br><span class="line">    Then <span class="string">"비어 있음"</span> <span class="keyword">do</span></span><br><span class="line">      expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  describe <span class="string">"#top"</span> <span class="keyword">do</span></span><br><span class="line">    context <span class="string">"만일 스택에 요소가 추가됨"</span> <span class="keyword">do</span></span><br><span class="line">      When &#123; stack.add(<span class="string">"A"</span>) &#125;</span><br><span class="line">      Then <span class="string">"그러면 그 요소가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">        expect(stack.top).to eq <span class="string">"A"</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  describe <span class="string">"#pop"</span> <span class="keyword">do</span></span><br><span class="line">    context <span class="string">"만일 스택이 N개의 요소를 가짐 그리고 요소 E가 스택의 제일 위에 위치함"</span> <span class="keyword">do</span></span><br><span class="line">      When &#123; <span class="string">%w(A B C D E)</span>.each &#123; <span class="params">|e|</span> stack.add(e) &#125; &#125;</span><br><span class="line">      Then <span class="string">"그러면 팝 연산은 E를 반환함"</span> <span class="keyword">do</span></span><br><span class="line">        expect(stack.pop).to eq <span class="string">"E"</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">      Then <span class="string">"그러면 팝연산 후의 새 스택 크기는 N-1이 됨"</span> <span class="keyword">do</span></span><br><span class="line">        stack.pop</span><br><span class="line">        expect(stack.size).to be <span class="number">4</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>큐컴버 만큼은 아니지만, 어느정도 정돈되어 보이네요.</p>
+<h1 id="결론"><a href="#결론" class="headerlink" title="결론"></a>결론</h1><p>bdd에 충실하게 rspec을 작성하는 법을 알아 보았습니다. 일정이 바쁘다던가
+사양이 복잡하던가 이러저러한 이유가 있긴하겠지만
+<a href="http://www.rubyinside.com/dhh-offended-by-rspec-debate-4610.html" target="_blank" rel="noopener">DHH도 불평</a>
+못하게 깔끔하게 작성하도록 노력해봅시다. :)</p>
+<h1 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h1><ul>
+<li><a href="http://www.chrisdpeters.com/introduction-feature-specs-rspec/" target="_blank" rel="noopener">http://www.chrisdpeters.com/introduction-feature-specs-rspec/</a></li>
+<li><a href="https://cucumber.io/" target="_blank" rel="noopener">https://cucumber.io/</a></li>
+<li><a href="https://github.com/rspec-given/rspec-given" target="_blank" rel="noopener">https://github.com/rspec-given/rspec-given</a></li>
+<li><a href="http://betterspecs.org/ko/" target="_blank" rel="noopener">http://betterspecs.org/ko/</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Behavior-driven_development" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Behavior-driven_development</a></li>
+</ul>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/ruby/">ruby</a><a href="/tags/rspec/">rspec</a><a href="/tags/bdd/">bdd</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>

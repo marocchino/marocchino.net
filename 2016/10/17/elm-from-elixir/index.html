@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>elm from elixir | A study note</title>
+
+  
+  <meta name="author" content="marocchino">
+  
+
+  
+  <meta name="description" content="이 글은 뽐뿌 글이 아니니 엘름의 좋은 점을 알고싶다면  다른
+글을
+읽으세요.
+연산자조금 다르긴한데 많이 신경쓰이는 정도는 아니다.
+몇가지 주목할 부분은..
+
+!=대신 \=을 사용한다.
+and or가 없다.
+|| &amp;amp;&amp;amp; 도 Bool 타입만 받아서 엘릭서에서">
+  
+
+  
+  
+  <meta name="keywords" content="elixir,elm">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="elm from elixir"/>
+
+  <meta property="og:site_name" content="A study note"/>
+
+  
+  <meta property="og:image" content="/favicon.ico"/>
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="A study note" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    <header>
+  <div class="site-branding">
+    <h1 class="site-title">
+      <a href="/">A study note</a>
+    </h1>
+    <p class="site-description"></p>
+  </div>
+  <nav class="site-navigation">
+    <ul>
+      
+    </ul>
+  </nav>
+</header>
+
+    <main class="site-main posts-loop">
+    <article>
+
+  
+    
+    <h3 class="article-title"><span>elm from elixir</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2016/10/17/elm-from-elixir/" rel="bookmark">
+        <time class="entry-date published" datetime="2016-10-17T01:25:02.000Z">
+          2016-10-17
+        </time>
+      </a>
+    </span>
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+        <p>이 글은 뽐뿌 글이 아니니 엘름의 좋은 점을 알고싶다면  <a href="http://bestalign.github.io/2015/11/28/elm-for-javascript-developers/index.html" target="_blank" rel="noopener">다른
+글</a>을
+읽으세요.</p>
+<h1 id="연산자"><a href="#연산자" class="headerlink" title="연산자"></a>연산자</h1><p>조금 다르긴한데 많이 신경쓰이는 정도는 아니다.
+몇가지 주목할 부분은..</p>
+<ul>
+<li><code>!=</code>대신 <code>\=</code>을 사용한다.</li>
+<li>and or가 없다.</li>
+<li><code>||</code> <code>&amp;&amp;</code> 도 Bool 타입만 받아서 엘릭서에서 인라인 if 대신 사용하던
+<code>valid or raise Error</code> 를 사용할 수 없다.</li>
+<li><code>/</code> 는 Float를 반환한다.</li>
+<li><code>div/2</code> 는 <code>//</code> 로 <code>rem/2</code>은 <code>%</code>로 사용할 수 있다.</li>
+</ul>
+<h1 id="함수"><a href="#함수" class="headerlink" title="함수"></a>함수</h1><p>basic 문서에 파이프가  없어서 없구나 싶었는데 그냥 메서드에 있었다 .
+엘릭서에는 없던 파이프가 몇개 더 있다. 커링에 더 특화되어 있는 느낌.</p>
+<h1 id="강타입과-컴파일"><a href="#강타입과-컴파일" class="headerlink" title="강타입과 컴파일"></a>강타입과 컴파일</h1><p>아.. 정말 여태까지 이렇게 채크해주는 언어를 해본적이 없어서 정말 미쳐버리는 줄
+알았는데 어느 정도 익숙해졌다. 일단 함수 선언 위에 타입을 전부 적어야 하고 이게
+실제 리턴 값과 다르면 컴파일이 안된다.
+처음에는 타입 맞추느라 삽질많이 했는데 익숙 해지니 그냥 저냥 할 만 하다. 루비나
+엘릭서에서는 파이프연결해 중간값 확인하면서 코딩했었는데 최종 타입 맞지않으면
+실행이 안되니 그런식으로 코딩하기 힘들어졌다. 일단 제일 많이 삽질했던 두 개만
+언급하고 넘어가자.</p>
+<h2 id="Maybe-XX"><a href="#Maybe-XX" class="headerlink" title="Maybe XX"></a>Maybe XX</h2><p>그냥 해당 타입이거나 Nothing을 반환 하는데 성공 했을때 (Just XX) 실패 했을때
+(Nothing)으로 나온다 map같은 이터레이터에 먹일 때 보통 이런 상태 말고 값만
+있을거라 예상하는데, 그렇지 않으니 처리하기 좀 번거롭다. 난 보통 케이스로
+처리한다.</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">case</span> a <span class="keyword">of</span></span><br><span class="line">    <span class="type">Just</span> x -&gt; x</span><br><span class="line">    <span class="type">Nothing</span> -&gt; <span class="type">Debug</span>.crash(<span class="string">"error"</span>)</span><br></pre></td></tr></table></figure>
+<p>뭐.. 당연한 이야기지만 결과가 nil이 아니므로</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value || default</span><br></pre></td></tr></table></figure>
+<p>같은 식으로는 쓸 수 없다. 이렇게 해야한다.</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Maybe</span>.withDefault <span class="number">100</span> (<span class="type">Just</span> <span class="number">42</span>)   <span class="comment">-- 42</span></span><br><span class="line"><span class="type">Maybe</span>.withDefault <span class="number">100</span> <span class="type">Nothing</span>     <span class="comment">-- 100</span></span><br></pre></td></tr></table></figure>
+<p>이터레이터 안에서 value만 뽑고 싶을 때에는 이렇게 하면된다.
+(내가 할 줄 몰라서) 좀 괴로웠다.</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">modifyList</span> : <span class="type">List</span> -&gt; <span class="type">Maybe</span> <span class="type">Nothing</span> (<span class="type">List</span> a)</span><br><span class="line"><span class="title">modifyList</span> list =</span><br><span class="line">    list</span><br><span class="line">        |&gt; some_maybe_methods</span><br><span class="line">        |&gt; <span class="type">List</span>.foldr (<span class="type">Maybe</span>.map2 (::)) (<span class="type">Just</span> [])</span><br></pre></td></tr></table></figure>
+<h2 id="Result"><a href="#Result" class="headerlink" title="Result"></a>Result</h2><p>성공했을 때 (Ok value), 실패했을 때 (Err reason)이 나온다.
+이녀석도 케이스로 처리해야 한다. 그거말고는 Maybe랑 비슷하게 하면 된다.</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">case</span> a <span class="keyword">of</span></span><br><span class="line">    <span class="type">Just</span> x -&gt; x</span><br><span class="line">    <span class="type">Nothing</span> -&gt; <span class="type">Debug</span>.crash(<span class="string">"error"</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="파이프-순서"><a href="#파이프-순서" class="headerlink" title="파이프 순서"></a>파이프 순서</h1><p>엘릭서와 다르게 제일 뒤에 있는게 사용되는데,  덕분에 가독성에서 좀 손해를
+보는 느낌이다. 예를 들자면 적어도 나에게는</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span>.contains? <span class="string">"elixir of life"</span>, <span class="string">"of"</span></span><br></pre></td></tr></table></figure>
+<p>보다는</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span>.contains <span class="string">"of"</span> <span class="string">"elm tree of life"</span></span><br></pre></td></tr></table></figure>
+<p>가 읽기 힘들다.</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"elm tree of life"</span> |&gt; <span class="type">String</span>.contains <span class="string">"of"</span></span><br></pre></td></tr></table></figure>
+<p>라고 적을 수 있긴하다. 실제로 그렇게 적을지는 또 다른 문제지만,</p>
+<p>라고 적으면 나쁜 점만 있는것 같지만.. 사실 커링 때문에 더 편해진 것도 많다.
+이런 상황을 생각해보자.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(a, b), <span class="symbol">do:</span> a + b</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_all</span></span>(list, num) <span class="keyword">do</span></span><br><span class="line">  list</span><br><span class="line">  |&gt; Enum.map(&amp;add(&amp;<span class="number">1</span>, num))</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>엘릭서에서는 아리티가 일치하지 않으면 외부 참조를 넘길수 없어서 이런
+레핑이 최선이었다.</p>
+<p>하지만 엘름은 다르다.</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">add</span> : <span class="type">Int</span> -&gt; <span class="type">Int</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">add</span> a b =</span><br><span class="line">    a + b</span><br><span class="line"></span><br><span class="line"><span class="title">addAll</span> : <span class="type">Int</span> -&gt; <span class="type">List</span> a -&gt; <span class="type">List</span> a</span><br><span class="line"><span class="title">addAll</span> num list =</span><br><span class="line">    <span class="keyword">let</span></span><br><span class="line">        plusNum = (add num)</span><br><span class="line">    <span class="keyword">in</span></span><br><span class="line">        list</span><br><span class="line">            |&gt; <span class="type">List</span>.map plusNum</span><br></pre></td></tr></table></figure>
+<p>인자가 불완전하게 넘겨진 상태도 함수이므로 그걸 그대로 함수 인자로 넘길 수 있다.</p>
+<h1 id="패턴-매칭"><a href="#패턴-매칭" class="headerlink" title="패턴 매칭"></a>패턴 매칭</h1><p>모든 조건을 커버 하지 못하면 컴파일이 안된다. 특히 리스트가 컴파일 시점에서
+갯수까지는 알수 없기때문에 let에는 디스트럭쳐링 할 수 없고 case를 사용해야 한다.</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[a, b, c] = list |&gt; Enum.sort</span><br></pre></td></tr></table></figure>
+<p>그래서 위에 있는 엘릭서에서는 간단히 되던 코드가 이렇게 되버렸다.</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">case</span> (<span class="type">List</span>.sort list) <span class="keyword">of</span></span><br><span class="line">    a::b::c::[] -&gt; ...</span><br><span class="line">    _ -&gt; <span class="type">Debug</span>.crash(<span class="string">"Impossible"</span>)</span><br></pre></td></tr></table></figure>
+<p>with도 없고 리스트 몇개만 매칭으로 풀어도 case중첩으로 산으로 가서
+타입에따라서는 그냥 없다고 생각하고 작성하는게 편할 수도 있다. 패턴 매칭이
+약해서 if else 구문을 평범하게 사용하는것도 다른 문화.</p>
+<h1 id="기타"><a href="#기타" class="headerlink" title="기타"></a>기타</h1><ul>
+<li>List의 렌덤 억세스에 관한 함수가 없다. 굳이 하고 싶으면 어레이로 변환해서
+해야한다. 근데 변환 여러번 하는 거보다 head tail로 어찌어찌하는게 비용이 적을
+것 같다.</li>
+<li>요즘은 어떨지 모르겠는데 옛날에 자바 싫어하는 이유 중 하나가 정규식 쓰기
+힘들어서 였는데 , 정규식용 리터럴이 따로 준비되어있지 않고 스트링으로 해서
+자바에서 정규식 쓰던 생각난다.</li>
+</ul>
+<h1 id="결론"><a href="#결론" class="headerlink" title="결론"></a>결론</h1><p>단순하게 되던게 번거로워 진 부분이 좀 많아서 생산성만 좀 더 뽑을 수 있으면 좋을
+것 같다는 생각을 했다.</p>
+
+      
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/elixir/">elixir</a><a href="/tags/elm/">elm</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+</article>
+
+  
+
+
+
+
+
+
+    </main>
+
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/CodeDaraW/Hacker" target="_blank">Hacker</a>
+    </br>
+    
+    &copy; 2021 marocchino
+    
+  </p>
+</footer>
+    
+    
+  </div>
+</div>
+</body>
+</html>
